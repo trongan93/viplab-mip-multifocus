@@ -53,46 +53,39 @@ public class PresenterMainActivity {
         processedMat1 = imageBasicProcessing1.ConvertToGrayMat(inputMat1);
         processedMat2 = imageBasicProcessing2.ConvertToGrayMat(inputMat2);
 
-
-
         //Reference document: http://docs.opencv.org/trunk/d3/db4/tutorial_py_watershed.html
         Imgproc.threshold(processedMat1, processedMat1, 0, 255, Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_OTSU);
         Imgproc.threshold(processedMat2, processedMat2, 0, 255, Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_OTSU);
 
-//        // Eliminate noise and smaller objects
-//        Photo.fastNlMeansDenoising(processedMat1,processedMat1); //denoising image
-//        Mat fg = new Mat(processedMat1.size(), CvType.CV_8U);
-//        Imgproc.erode(processedMat1, fg, new Mat(), new Point(-1, -1), 2);
-//
-//        // Identify image pixels without objects
-//        Mat bg = new Mat(processedMat1.size(), CvType.CV_8U);
-//        Imgproc.dilate(processedMat1, bg, new Mat(), new Point(-1, -1), 3);
-//        Imgproc.threshold(bg,bg,1,128,Imgproc.THRESH_BINARY_INV);
-//
-//        // Create markers image
-//        Mat markers = new Mat(processedMat1.size(), CvType.CV_8U, new Scalar(0));
-//        Core.add(fg, bg, markers);
-//        Imgproc.watershed(processedMat1,markers);
-
         //# noise removal
         Mat kernel = zeros(3,3,CvType.CV_8U);
-        Mat opening = new Mat();
+        Mat opening1 = new Mat();
+        Mat opening2 = new Mat();
 //        Imgproc.morphologyEx(processedMat1, opening, Imgproc.MORPH_OPEN, kernel, new Point(),2);
-        Imgproc.morphologyEx(processedMat1, opening, Imgproc.MORPH_OPEN, kernel);
+        Imgproc.morphologyEx(processedMat1, opening1, Imgproc.MORPH_OPEN, kernel);
+        Imgproc.morphologyEx(processedMat2, opening2, Imgproc.MORPH_OPEN, kernel);
 
         //# sure background area
-        Mat sure_bg = new Mat(processedMat1.size(),CvType.CV_8U);
-        Imgproc.dilate(opening,sure_bg,kernel,new Point(),3);
+        Mat sure_bg1 = new Mat(processedMat1.size(),CvType.CV_8U);
+        Mat sure_bg2 = new Mat(processedMat2.size(),CvType.CV_8U);
+        Imgproc.dilate(opening1,sure_bg1,kernel,new Point(),3);
+        Imgproc.dilate(opening2,sure_bg2,kernel,new Point(),3);
 
         //# Finding sure foreground area
-        Mat distTransform = new Mat();
-        Imgproc.distanceTransform(opening,distTransform,Imgproc.DIST_L2,5);
-        Imgproc.threshold(distTransform, processedMat1, 0.7*Core.minMaxLoc(distTransform).maxVal,255,0);
+        Mat distTransform1 = new Mat();
+        Mat distTransform2 = new Mat();
+        Imgproc.distanceTransform(opening1,distTransform1,Imgproc.DIST_L2,5);
+        Imgproc.distanceTransform(opening2, distTransform2, Imgproc.DIST_L2,5);
+        Mat sure_fg1 = new Mat(processedMat1.size(),CvType.CV_8U);
+        Mat sure_fg2 = new Mat(processedMat2.size(),CvType.CV_8U);
+        Imgproc.threshold(distTransform1, sure_fg1, 0.7*Core.minMaxLoc(distTransform1).maxVal,255,0);
+        Imgproc.threshold(distTransform2, sure_fg2, 0.7*Core.minMaxLoc(distTransform2).maxVal,255,0);
 
-        //# Finding unknown region
-        Mat sure_fg = new Mat(processedMat1.size(),CvType.CV_8U);
-        Core.subtract(sure_bg, sure_fg, processedMat1);
-
+        //# Finding unknown regions
+//        Core.subtract(sure_bg1, sure_fg1, processedMat1);
+//        Core.subtract(sure_bg2, sure_fg2, processedMat2);
+        Core.subtract(sure_bg1, sure_fg1, processedMat1 , new Mat(), CvType.CV_8U);
+        Core.subtract(sure_bg2, sure_fg2, processedMat2, new Mat(), CvType.CV_8U);
 
         //Show Image
         ShowImage(processedImageView1, processedMat1);
