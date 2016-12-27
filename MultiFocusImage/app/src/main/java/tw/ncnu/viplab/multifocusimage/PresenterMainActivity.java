@@ -1,5 +1,6 @@
 package tw.ncnu.viplab.multifocusimage;
 
+import android.util.Log;
 import android.widget.ImageView;
 
 import org.opencv.core.Core;
@@ -14,6 +15,9 @@ import java.lang.reflect.Array;
 
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
+
+import static org.opencv.core.Mat.ones;
+import static org.opencv.core.Mat.zeros;
 
 /**
  * Created by Bui Trong An on 12/26/2016.
@@ -71,10 +75,10 @@ public class PresenterMainActivity {
 //        Imgproc.watershed(processedMat1,markers);
 
         //# noise removal
-        Mat kernel = new Mat(3,3,CvType.CV_8U);
-        //Imgproc.morphologyEx(inputMat1, inputMat1, Imgproc.MORPH_OPEN, kernel);
+        Mat kernel = zeros(3,3,CvType.CV_8U);
         Mat opening = new Mat();
-        Imgproc.morphologyEx(processedMat1,opening,Imgproc.MORPH_OPEN,kernel,new Point(),2);
+//        Imgproc.morphologyEx(processedMat1, opening, Imgproc.MORPH_OPEN, kernel, new Point(),2);
+        Imgproc.morphologyEx(processedMat1, opening, Imgproc.MORPH_OPEN, kernel);
 
         //# sure background area
         Mat sure_bg = new Mat(processedMat1.size(),CvType.CV_8U);
@@ -88,6 +92,7 @@ public class PresenterMainActivity {
         //# Finding unknown region
         Mat sure_fg = new Mat(processedMat1.size(),CvType.CV_8U);
         Core.subtract(sure_bg, sure_fg, processedMat1);
+
 
         //Show Image
         ShowImage(processedImageView1, processedMat1);
