@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         processedImage2 = (ImageView)this.findViewById(R.id.imvOriginal2);
 
         presenterMainActivity = new PresenterMainActivity(processedImage1, processedImage2);
-        presenterMainActivity.Progress2016DecWeek4();
+//        presenterMainActivity.Progress2016DecWeek4();
+        presenterMainActivity.Progress2017JanWeek1();
     }
 }

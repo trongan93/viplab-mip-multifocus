@@ -1,13 +1,19 @@
 package tw.ncnu.viplab.multifocusimage;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
 
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.features2d.DescriptorExtractor;
+import org.opencv.features2d.DescriptorMatcher;
+import org.opencv.features2d.FeatureDetector;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.photo.Photo;
 
@@ -15,6 +21,7 @@ import java.lang.reflect.Array;
 
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
+import tw.ncnu.viplab.multifocusimage.ImageProcessing.WatershedSegmenter;
 
 import static org.opencv.core.Mat.ones;
 import static org.opencv.core.Mat.zeros;
@@ -30,6 +37,11 @@ public class PresenterMainActivity {
     ImageBasicProcessing imageBasicProcessing1, imageBasicProcessing2;
     Mat processedMat1, processedMat2;
     ImageView processedImageView1, processedImageView2;
+
+    //Variable for detector
+    FeatureDetector detector;
+    DescriptorExtractor descriptorExtractor;
+    DescriptorMatcher descriptorMatcher;
 
     public PresenterMainActivity(ImageView processedImage1, ImageView processedImage2){
         processedImageView1 = processedImage1;
@@ -92,5 +104,91 @@ public class PresenterMainActivity {
         ShowImage(processedImageView2, processedMat2);
     }
 
+    public void Progress2017JanWeek1(){
+//        detector = FeatureDetector.create(FeatureDetector.ORB);
+//        descriptorExtractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
+//        descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+//
+//
+//        MatOfKeyPoint keyPoint1 = new MatOfKeyPoint();
+//        MatOfKeyPoint keyPoint2 = new MatOfKeyPoint();
+//        detector.detect(inputMat1,keyPoint1);
+//        detector.detect(inputMat2,keyPoint2);
+
+
+//        Mat markerMask = new Mat();
+//        Mat marker = new Mat();
+//        Imgproc.cvtColor(inputMat1, markerMask, Imgproc.COLOR_RGB2GRAY);
+//        Imgproc.watershed(inputMat1, marker);
+//        marker.convertTo(marker,CvType.CV_8U);
+//        ShowImage(processedImageView1, marker);
+
+
+        //Apply watershed
+        processedMat1 = applyWaterShed(inputMat1);
+        processedMat2 = applyWaterShed(inputMat2);
+        //Show Image
+        ShowImage(processedImageView1, processedMat1);
+        ShowImage(processedImageView2, processedMat2);
+
+
+    }
+    private Mat applyWaterShed(Mat mRgba) {
+        Mat result;
+        try {
+            Mat threeChannel = new Mat();
+            Imgproc.cvtColor(mRgba, threeChannel, Imgproc.COLOR_BGR2GRAY);
+            Imgproc.threshold(threeChannel, threeChannel, 100, 255, Imgproc.THRESH_BINARY);
+
+            // Eliminate noise and smaller objects
+            Mat fg = new Mat(mRgba.size(), CvType.CV_8U);
+            Imgproc.erode(threeChannel, fg, new Mat(), new Point(-1, -1), 2);
+
+            // Identify image pixels without objects
+            Mat bg = new Mat(mRgba.size(), CvType.CV_8U);
+            Imgproc.dilate(threeChannel, bg, new Mat(), new Point(-1, -1), 3);
+            Imgproc.threshold(bg, bg, 1, 128, Imgproc.THRESH_BINARY_INV);
+
+
+            // Create markers image
+            Mat marker = new Mat(mRgba.size(), CvType.CV_8U, new Scalar(0));
+            Core.add(fg, bg, marker);
+
+
+//            //Convert Image to gray Image
+//            result = imageBasicProcessing1.ConvertToGrayMat(mRgba);
+//
+//            //Reference document: http://docs.opencv.org/trunk/d3/db4/tutorial_py_watershed.html
+//            Imgproc.threshold(result, result, 0, 255, Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_OTSU);
+//
+//            //# noise removal
+//            Mat kernel = zeros(3,3,CvType.CV_8U);
+//            Mat opening = new Mat();
+//            Imgproc.morphologyEx(result, opening, Imgproc.MORPH_OPEN, kernel);
+//
+//            //# sure background area
+//            Mat sure_bg = new Mat(result.size(),CvType.CV_8U);
+//            Imgproc.dilate(opening,sure_bg,kernel,new Point(),3);
+//
+//            //# Finding sure foreground area
+//            Mat distTransform = new Mat();
+//            Imgproc.distanceTransform(opening,distTransform,Imgproc.DIST_L2,5);
+//            Mat sure_fg = new Mat(result.size(),CvType.CV_8U);
+//            Imgproc.threshold(distTransform, sure_fg, 0.7*Core.minMaxLoc(distTransform).maxVal,255,0);
+//
+//            //# Finding unknown regions
+//            Mat marker = new Mat(mRgba.size(), CvType.CV_8U, new Scalar(0));
+//            Core.add(sure_fg, sure_bg, marker , new Mat(), CvType.CV_8U);
+
+            // Create watershed segmentation object
+            WatershedSegmenter.setMarkers(marker);
+            result = WatershedSegmenter.process(mRgba);
+        } catch (Exception e) {
+            result = mRgba;
+            Log.d("anbt","Fail Apply WaterShed");
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 }

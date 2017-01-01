@@ -24,11 +24,9 @@ public final class ControlImage {
         return matImage;
     }
     public static void ConvertMatToBitmap(Mat srcMat, ImageView imageView){
-        BitmapDrawable drawable = (BitmapDrawable)imageView.getDrawable();
-        Bitmap resultBitmap = drawable.getBitmap();
-
-        Utils.matToBitmap(srcMat, resultBitmap);
-        imageView.setImageBitmap(resultBitmap);
+        Bitmap bp = Bitmap.createBitmap(srcMat.cols(),srcMat.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(srcMat, bp);
+        imageView.setImageBitmap(bp);
     }
 
 
