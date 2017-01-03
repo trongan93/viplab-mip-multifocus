@@ -136,53 +136,65 @@ public class PresenterMainActivity {
     private Mat applyWaterShed(Mat mRgba) {
         Mat result;
         try {
-            Mat threeChannel = new Mat();
-            Imgproc.cvtColor(mRgba, threeChannel, Imgproc.COLOR_BGR2GRAY);
-            Imgproc.threshold(threeChannel, threeChannel, 100, 255, Imgproc.THRESH_BINARY);
-
-            // Eliminate noise and smaller objects
-            Mat fg = new Mat(mRgba.size(), CvType.CV_8U);
-            Imgproc.erode(threeChannel, fg, new Mat(), new Point(-1, -1), 2);
-
-            // Identify image pixels without objects
-            Mat bg = new Mat(mRgba.size(), CvType.CV_8U);
-            Imgproc.dilate(threeChannel, bg, new Mat(), new Point(-1, -1), 3);
-            Imgproc.threshold(bg, bg, 1, 128, Imgproc.THRESH_BINARY_INV);
-
-
-            // Create markers image
-            Mat marker = new Mat(mRgba.size(), CvType.CV_8U, new Scalar(0));
-            Core.add(fg, bg, marker);
-
-
-//            //Convert Image to gray Image
-//            result = imageBasicProcessing1.ConvertToGrayMat(mRgba);
+            ///Old Process
+//            Mat threeChannel = new Mat();
+//            Imgproc.cvtColor(mRgba, threeChannel, Imgproc.COLOR_BGR2GRAY);
+//            Imgproc.threshold(threeChannel, threeChannel, 100, 255, Imgproc.THRESH_BINARY);
 //
-//            //Reference document: http://docs.opencv.org/trunk/d3/db4/tutorial_py_watershed.html
-//            Imgproc.threshold(result, result, 0, 255, Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_OTSU);
+//            // Eliminate noise and smaller objects
+//            Mat fg = new Mat(mRgba.size(), CvType.CV_8U);
+//            Imgproc.erode(threeChannel, fg, new Mat(), new Point(-1, -1), 2);
 //
-//            //# noise removal
-//            Mat kernel = zeros(3,3,CvType.CV_8U);
-//            Mat opening = new Mat();
-//            Imgproc.morphologyEx(result, opening, Imgproc.MORPH_OPEN, kernel);
+//            // Identify image pixels without objects
+//            Mat bg = new Mat(mRgba.size(), CvType.CV_8U);
+//            Imgproc.dilate(threeChannel, bg, new Mat(), new Point(-1, -1), 3);
+//            Imgproc.threshold(bg, bg, 1, 128, Imgproc.THRESH_BINARY_INV);
 //
-//            //# sure background area
-//            Mat sure_bg = new Mat(result.size(),CvType.CV_8U);
-//            Imgproc.dilate(opening,sure_bg,kernel,new Point(),3);
-//
-//            //# Finding sure foreground area
-//            Mat distTransform = new Mat();
-//            Imgproc.distanceTransform(opening,distTransform,Imgproc.DIST_L2,5);
-//            Mat sure_fg = new Mat(result.size(),CvType.CV_8U);
-//            Imgproc.threshold(distTransform, sure_fg, 0.7*Core.minMaxLoc(distTransform).maxVal,255,0);
-//
-//            //# Finding unknown regions
+//            // Create markers image
 //            Mat marker = new Mat(mRgba.size(), CvType.CV_8U, new Scalar(0));
-//            Core.add(sure_fg, sure_bg, marker , new Mat(), CvType.CV_8U);
+//            Core.add(fg, bg, marker);
 
+
+            //New process
+            //Convert Image to gray Image
+            ImageBasicProcessing imageBasicProcessing = new ImageBasicProcessing(mRgba);
+            result = imageBasicProcessing.ConvertToGrayMat(mRgba);
+
+            //Reference document: http://docs.opencv.org/trunk/d3/db4/tutorial_py_watershed.html
+            Imgproc.threshold(result, result, 0, 255, Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_OTSU);
+
+            //# noise removal
+            Mat kernel = zeros(3,3,CvType.CV_8U);
+            Mat opening = new Mat();
+            Imgproc.morphologyEx(result, opening, Imgproc.MORPH_OPEN, kernel);
+
+            //# sure background area
+            Mat sure_bg = new Mat(result.size(),CvType.CV_8U);
+            Imgproc.dilate(opening,sure_bg,kernel,new Point(),3);
+
+            //# Finding sure foreground area
+            Mat distTransform = new Mat();
+            Imgproc.distanceTransform(opening,distTransform,Imgproc.DIST_L2,5);
+            Mat sure_fg = new Mat(result.size(),CvType.CV_8U);
+            Imgproc.threshold(distTransform, sure_fg, 0.7*Core.minMaxLoc(distTransform).maxVal,255,0);
+
+            //# Finding unknown regions
+            //Mat marker = new Mat(mRgba.size(), CvType.CV_8U, new Scalar(0));
+            //Core.add(sure_fg, sure_bg, marker , new Mat(), CvType.CV_8U);
+            Mat unknow = new Mat();
+            Core.absdiff(sure_bg,sure_fg,unknow);
+
+            //#Marker labelling
+            Mat markers = new Mat();
+            Imgproc.connectedComponents(sure_bg, markers);
+
+            Imgproc.watershed(result, markers);
+
+
+            //Apply watershed
             // Create watershed segmentation object
-            WatershedSegmenter.setMarkers(marker);
-            result = WatershedSegmenter.process(mRgba);
+//            WatershedSegmenter.setMarkers(marker);
+//            result = WatershedSegmenter.process(mRgba);
         } catch (Exception e) {
             result = mRgba;
             Log.d("anbt","Fail Apply WaterShed");
