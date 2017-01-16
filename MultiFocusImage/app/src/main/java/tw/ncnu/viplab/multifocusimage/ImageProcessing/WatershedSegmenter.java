@@ -11,18 +11,21 @@ import org.opencv.imgproc.Imgproc;
  */
 
 public final class WatershedSegmenter {
-    public static Mat markers= new Mat();
+
+    private static Mat markers;
 
     public static void setMarkers(Mat markerImage)
     {
+        // Convert to image of ints
         markerImage.convertTo(markers, CvType.CV_32SC1);
     }
 
     public static Mat process(Mat image)
     {
-        Imgproc.cvtColor(image, image, Imgproc.COLOR_BGRA2BGR);
+        // Apply watershed
+        //Imgproc.cvtColor(image, image, Imgproc.COLOR_BGRA2BGR);
         Imgproc.watershed(image,markers);
-        markers.convertTo(markers,CvType.CV_8U);
+        //markers.convertTo(markers,CvType.CV_8U);
         return markers;
     }
 }
