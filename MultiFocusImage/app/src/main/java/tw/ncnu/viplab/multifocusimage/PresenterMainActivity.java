@@ -14,6 +14,7 @@ import org.opencv.core.Scalar;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
+import org.opencv.features2d.Features2d;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.photo.Photo;
 
@@ -39,11 +40,11 @@ public class PresenterMainActivity {
     ImageView processedImageView1, processedImageView2;
 
     //Variable for detector
-    FeatureDetector detector;
-    DescriptorExtractor descriptorExtractor;
-    DescriptorMatcher descriptorMatcher;
+    //FeatureDetector detector;
+    //DescriptorExtractor descriptorExtractor;
+    //DescriptorMatcher descriptorMatcher;
 
-    public PresenterMainActivity(ImageView processedImage1, ImageView processedImage2){
+    public PresenterMainActivity(ImageView processedImage1, ImageView processedImage2) {
         processedImageView1 = processedImage1;
         processedImageView2 = processedImage2;
 
@@ -52,15 +53,16 @@ public class PresenterMainActivity {
         imageBasicProcessing1 = new ImageBasicProcessing(inputMat1);
         imageBasicProcessing2 = new ImageBasicProcessing(inputMat2);
     }
-    private Mat InputImage(ImageView inputImage){
+
+    private Mat InputImage(ImageView inputImage) {
         return ControlImage.ConvertImageViewToMat(inputImage);
     }
 
-    private void ShowImage(ImageView inputImage, Mat processedMat){
-         ControlImage.ConvertMatToBitmap(processedMat, inputImage);
+    private void ShowImage(ImageView inputImage, Mat processedMat) {
+        ControlImage.ConvertMatToBitmap(processedMat, inputImage);
     }
 
-    public void Progress2016DecWeek4(){
+    public void Progress2016DecWeek4() {
 //        //Convert Image to gray Image
         processedMat1 = imageBasicProcessing1.ConvertToGrayMat(inputMat1);
         processedMat2 = imageBasicProcessing2.ConvertToGrayMat(inputMat2);
@@ -70,7 +72,7 @@ public class PresenterMainActivity {
         Imgproc.threshold(processedMat2, processedMat2, 0, 255, Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_OTSU);
 
         //# noise removal
-        Mat kernel = zeros(3,3,CvType.CV_8U);
+        Mat kernel = zeros(3, 3, CvType.CV_8U);
         Mat opening1 = new Mat();
         Mat opening2 = new Mat();
 //        Imgproc.morphologyEx(processedMat1, opening, Imgproc.MORPH_OPEN, kernel, new Point(),2);
@@ -78,25 +80,25 @@ public class PresenterMainActivity {
         Imgproc.morphologyEx(processedMat2, opening2, Imgproc.MORPH_OPEN, kernel);
 
         //# sure background area
-        Mat sure_bg1 = new Mat(processedMat1.size(),CvType.CV_8U);
-        Mat sure_bg2 = new Mat(processedMat2.size(),CvType.CV_8U);
-        Imgproc.dilate(opening1,sure_bg1,kernel,new Point(),3);
-        Imgproc.dilate(opening2,sure_bg2,kernel,new Point(),3);
+        Mat sure_bg1 = new Mat(processedMat1.size(), CvType.CV_8U);
+        Mat sure_bg2 = new Mat(processedMat2.size(), CvType.CV_8U);
+        Imgproc.dilate(opening1, sure_bg1, kernel, new Point(), 3);
+        Imgproc.dilate(opening2, sure_bg2, kernel, new Point(), 3);
 
         //# Finding sure foreground area
         Mat distTransform1 = new Mat();
         Mat distTransform2 = new Mat();
-        Imgproc.distanceTransform(opening1,distTransform1,Imgproc.DIST_L2,5);
-        Imgproc.distanceTransform(opening2, distTransform2, Imgproc.DIST_L2,5);
-        Mat sure_fg1 = new Mat(processedMat1.size(),CvType.CV_8U);
-        Mat sure_fg2 = new Mat(processedMat2.size(),CvType.CV_8U);
-        Imgproc.threshold(distTransform1, sure_fg1, 0.7*Core.minMaxLoc(distTransform1).maxVal,255,0);
-        Imgproc.threshold(distTransform2, sure_fg2, 0.7*Core.minMaxLoc(distTransform2).maxVal,255,0);
+        Imgproc.distanceTransform(opening1, distTransform1, Imgproc.DIST_L2, 5);
+        Imgproc.distanceTransform(opening2, distTransform2, Imgproc.DIST_L2, 5);
+        Mat sure_fg1 = new Mat(processedMat1.size(), CvType.CV_8U);
+        Mat sure_fg2 = new Mat(processedMat2.size(), CvType.CV_8U);
+        Imgproc.threshold(distTransform1, sure_fg1, 0.7 * Core.minMaxLoc(distTransform1).maxVal, 255, 0);
+        Imgproc.threshold(distTransform2, sure_fg2, 0.7 * Core.minMaxLoc(distTransform2).maxVal, 255, 0);
 
         //# Finding unknown regions
 //        Core.subtract(sure_bg1, sure_fg1, processedMat1);
 //        Core.subtract(sure_bg2, sure_fg2, processedMat2);
-        Core.subtract(sure_bg1, sure_fg1, processedMat1 , new Mat(), CvType.CV_8U);
+        Core.subtract(sure_bg1, sure_fg1, processedMat1, new Mat(), CvType.CV_8U);
         Core.subtract(sure_bg2, sure_fg2, processedMat2, new Mat(), CvType.CV_8U);
 
         //Show Image
@@ -104,7 +106,7 @@ public class PresenterMainActivity {
         ShowImage(processedImageView2, processedMat2);
     }
 
-    public void Progress2017JanWeek1(){
+    public void Progress2017JanWeek1() {
 //        detector = FeatureDetector.create(FeatureDetector.ORB);
 //        descriptorExtractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
 //        descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
@@ -133,6 +135,7 @@ public class PresenterMainActivity {
 
 
     }
+
     private Mat applyWaterShed(Mat mRgba) {
         Mat result;
         try {
@@ -185,10 +188,56 @@ public class PresenterMainActivity {
             result = WatershedSegmenter.process(mRgba);
         } catch (Exception e) {
             result = mRgba;
-            Log.d("anbt","Fail Apply WaterShed");
+            Log.d("anbt", "Fail Apply WaterShed");
             e.printStackTrace();
         }
         return result;
     }
 
+    public void Progress2017JanWeek3(){
+        FeatureDetector detector = FeatureDetector.create(FeatureDetector.ORB);
+        MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
+        MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
+        DescriptorExtractor descriptorExtractor =  DescriptorExtractor.create(DescriptorExtractor.ORB);
+
+        //detect the keypoints
+        detector.detect(inputMat1,keypoints1);
+        detector.detect(inputMat2,keypoints2);
+
+        processedMat1 = new Mat();
+        processedMat2 = new Mat();
+//        processedMat1 = imageBasicProcessing1.ConvertToGrayMat(inputMat1);
+//        processedMat2 = imageBasicProcessing2.ConvertToGrayMat(inputMat2);
+        Imgproc.cvtColor(inputMat1,processedMat1,Imgproc.COLOR_RGBA2RGB);
+        Imgproc.cvtColor(inputMat2,processedMat2, Imgproc.COLOR_RGBA2RGB);
+
+        //Scalar in function drawKeypoints is color of Keypoint
+        //DrawMatchesFlags
+        //DEFAULT = 0, // Output image matrix will be created (Mat::create),
+        // i.e. existing memory of output image may be reused.
+        // Two source images, matches, and single keypoints
+        // will be drawn.
+        // For each keypoint, only the center point will be
+        // drawn (without a circle around the keypoint with the
+        // keypoint size and orientation).
+        // DRAW_OVER_OUTIMG = 1, // Output image matrix will not be
+        // created (using Mat::create). Matches will be drawn
+        // on existing content of output image.
+        // NOT_DRAW_SINGLE_POINTS = 2, // Single keypoints will not be drawn.
+        // DRAW_RICH_KEYPOINTS = 4 // For each keypoint, the circle around
+        // keypoint with keypoint size and orientation will
+        // be drawn.
+        Features2d.drawKeypoints(processedMat1,keypoints1,processedMat1,new Scalar(255,0,0),4);
+        Features2d.drawKeypoints(processedMat2,keypoints2,processedMat2,new Scalar(255,255,0),4);
+
+
+        //DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+
+        ShowImage(processedImageView1, processedMat1);
+        ShowImage(processedImageView2, processedMat2);
+
+        Mat descriptors1 = new Mat();
+        Mat descriptors2 = new Mat();
+
+    }
 }
