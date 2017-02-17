@@ -16,15 +16,11 @@ import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.photo.Photo;
 
-import java.lang.reflect.Array;
 
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.WatershedSegmenter;
-
-import static org.opencv.core.Mat.ones;
 import static org.opencv.core.Mat.zeros;
 
 /**
@@ -204,40 +200,39 @@ public class PresenterMainActivity {
         detector.detect(inputMat1,keypoints1);
         detector.detect(inputMat2,keypoints2);
 
+        //detect decriptor
+        Mat descriptors1 = new Mat();
+        Mat descriptors2 = new Mat();
+        descriptorExtractor.compute(inputMat1,keypoints1,descriptors1);
+        descriptorExtractor.compute(inputMat2,keypoints2,descriptors2);
+
         processedMat1 = new Mat();
         processedMat2 = new Mat();
-//        processedMat1 = imageBasicProcessing1.ConvertToGrayMat(inputMat1);
-//        processedMat2 = imageBasicProcessing2.ConvertToGrayMat(inputMat2);
+
         Imgproc.cvtColor(inputMat1,processedMat1,Imgproc.COLOR_RGBA2RGB);
         Imgproc.cvtColor(inputMat2,processedMat2, Imgproc.COLOR_RGBA2RGB);
 
         //Scalar in function drawKeypoints is color of Keypoint
         //DrawMatchesFlags
-        //DEFAULT = 0, // Output image matrix will be created (Mat::create),
-        // i.e. existing memory of output image may be reused.
-        // Two source images, matches, and single keypoints
-        // will be drawn.
-        // For each keypoint, only the center point will be
-        // drawn (without a circle around the keypoint with the
-        // keypoint size and orientation).
-        // DRAW_OVER_OUTIMG = 1, // Output image matrix will not be
-        // created (using Mat::create). Matches will be drawn
-        // on existing content of output image.
+        //DEFAULT = 0, // Output image matrix will be created (Mat::create), i.e. existing memory of output image may be reused. Two source images, matches, and single keypoints will be drawn. For each keypoint, only the center point will be drawn (without a circle around the keypoint with the keypoint size and orientation).
+        // DRAW_OVER_OUTIMG = 1, // Output image matrix will not be created (using Mat::create). Matches will be drawn on existing content of output image.
         // NOT_DRAW_SINGLE_POINTS = 2, // Single keypoints will not be drawn.
-        // DRAW_RICH_KEYPOINTS = 4 // For each keypoint, the circle around
-        // keypoint with keypoint size and orientation will
-        // be drawn.
-        Features2d.drawKeypoints(processedMat1,keypoints1,processedMat1,new Scalar(255,0,0),4);
+        // DRAW_RICH_KEYPOINTS = 4 // For each keypoint, the circle around keypoint with keypoint size and orientation will be drawn.
+        Features2d.drawKeypoints(processedMat1,keypoints1,processedMat1,new Scalar(255,255,0),4);
         Features2d.drawKeypoints(processedMat2,keypoints2,processedMat2,new Scalar(255,255,0),4);
 
 
-        //DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+//        MatOfDMatch matches = new MatOfDMatch();
+//        descriptorMatcher.match(descriptors1,descriptors2,matches);
+//        //output Image
+//        Mat outputImg = new Mat();
+//        MatOfByte drawnMatches = new MatOfByte();
+//        Features2d.drawMatches(inputMat1,keypoints1,inputMat2,keypoints2,matches,outputImg,new Scalar(255,0,0), new Scalar(0,255,0), drawnMatches, Features2d.NOT_DRAW_SINGLE_POINTS);
+
 
         ShowImage(processedImageView1, processedMat1);
         ShowImage(processedImageView2, processedMat2);
-
-        Mat descriptors1 = new Mat();
-        Mat descriptors2 = new Mat();
 
     }
 }

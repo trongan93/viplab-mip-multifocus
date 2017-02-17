@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
         if(!OpenCVLoader.initDebug()){
             Log.d(TAG,"OpenCV not loaded");
         }
+//        System.loadLibrary("opencvNative");
     }
     ImageView processedImage1, processedImage2;
     PresenterMainActivity presenterMainActivity;
