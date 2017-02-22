@@ -277,10 +277,8 @@ public class PresenterMainActivity {
 //        }
 //        descriptorMatcher.match(descriptors1,drawing,matches);
 
-
         ShowImage(processedImageView1, processedMat1);
         ShowImage(processedImageView2, processedMat1_detectedEdges);
         // ShowImage(processedImageView2, drawing);
-
     }
 }
