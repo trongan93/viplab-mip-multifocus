@@ -5,18 +5,27 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import org.opencv.android.Utils;
+import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 
+
+import java.util.ArrayList;
+import java.util.List;
 
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
@@ -36,6 +45,7 @@ public class PresenterMainActivity {
     ImageView processedImageView1, processedImageView2;
 
     //Variable for detector
+
     //FeatureDetector detector;
     //DescriptorExtractor descriptorExtractor;
     //DescriptorMatcher descriptorMatcher;
@@ -217,22 +227,60 @@ public class PresenterMainActivity {
         //DEFAULT = 0, // Output image matrix will be created (Mat::create), i.e. existing memory of output image may be reused. Two source images, matches, and single keypoints will be drawn. For each keypoint, only the center point will be drawn (without a circle around the keypoint with the keypoint size and orientation).
         // DRAW_OVER_OUTIMG = 1, // Output image matrix will not be created (using Mat::create). Matches will be drawn on existing content of output image.
         // NOT_DRAW_SINGLE_POINTS = 2, // Single keypoints will not be drawn.
-        // DRAW_RICH_KEYPOINTS = 4 // For each keypoint, the circle around keypoint with keypoint size and orientation will be drawn.
+        // DRAW_RICH_KEYPOINTS = 4 // For each keypoint,
+        // the circle around keypoint with keypoint size and orientation will be drawn.
         Features2d.drawKeypoints(processedMat1,keypoints1,processedMat1,new Scalar(255,255,0),4);
         Features2d.drawKeypoints(processedMat2,keypoints2,processedMat2,new Scalar(255,255,0),4);
 
-
-        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+//        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+//        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(4);
 //        MatOfDMatch matches = new MatOfDMatch();
 //        descriptorMatcher.match(descriptors1,descriptors2,matches);
+
 //        //output Image
 //        Mat outputImg = new Mat();
 //        MatOfByte drawnMatches = new MatOfByte();
 //        Features2d.drawMatches(inputMat1,keypoints1,inputMat2,keypoints2,matches,outputImg,new Scalar(255,0,0), new Scalar(0,255,0), drawnMatches, Features2d.NOT_DRAW_SINGLE_POINTS);
 
+//        Mat H1 = Calib3d.findHomography(processedMat2, processedMat1);
+
+        Log.d("trongan93","Image 1 - Descripter Size: " + descriptors1.size());
+        Log.d("trongan93","Image 2 - Descripter Size: " + descriptors2.size());
+
+       //Image Segmentation
+        Mat processedMat1_Binary = new Mat();
+        Mat processedMat1_detectedEdges = new Mat();
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        Mat hierarchy = new Mat();
+
+        Imgproc.cvtColor(inputMat1, processedMat1_Binary, Imgproc.COLOR_RGBA2GRAY);
+
+        Imgproc.blur(processedMat1_Binary,processedMat1_detectedEdges, new Size(3,3));
+        double threshold = 50;
+        Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*3,3,false);
+
+//        Imgproc.findContours(processedMat1_detectedEdges.clone(),contours,hierarchy,Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+//        hierarchy.release();
+//
+//        //draw Contours
+//        Imgproc.drawContours(processedMat1_detectedEdges,contours,-1,new Scalar(Math.random()*255,Math.random()*255));
+//
+//        //create mask
+//        Mat input1Mask = new Mat(inputMat1.rows(),inputMat1.cols(), CvType.CV_8U);
+//        Imgproc.drawContours(input1Mask,contours,-1,new Scalar(Math.random()*255,Math.random()*255));
+
+//        //Draw contours
+//        Mat drawing = new Mat(inputMat1.size(),CvType.CV_8UC3, new Scalar(255,255,255));
+//        for(int i = 0; i < contours.size(); i++){
+//            Scalar color = new Scalar(Math.random()*255,Math.random()*255,Math.random()*255);
+//            Imgproc.drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, new Point());
+//        }
+//        descriptorMatcher.match(descriptors1,drawing,matches);
+
 
         ShowImage(processedImageView1, processedMat1);
-        ShowImage(processedImageView2, processedMat2);
+        ShowImage(processedImageView2, processedMat1_detectedEdges);
+        // ShowImage(processedImageView2, drawing);
 
     }
 }
