@@ -1,11 +1,19 @@
 package tw.ncnu.viplab.multifocusimage;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 
 import org.opencv.android.OpenCVLoader;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -27,5 +35,23 @@ public class MainActivity extends AppCompatActivity {
         presenterMainActivity = new PresenterMainActivity(processedImage1, processedImage2);
 //        presenterMainActivity.Progress2016DecWeek4();
         presenterMainActivity.Progress2017JanWeek3();
+        //Focus Touch and detect object
+        //presenterMainActivity.Progress2017FebWeek4();
+        presenterMainActivity.onTouchImageView();
+//        final List<Integer> RGBValueNearFocusTouched = new ArrayList<>();
+//        final Bitmap bitmapNearFocus = ((BitmapDrawable)processedImage1.getDrawable()).getBitmap();
+//        processedImage1.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                int pixel = bitmapNearFocus.getPixel((int)motionEvent.getX(),(int)motionEvent.getY());
+//                Log.d("anbt","pixel: " + pixel);
+//                RGBValueNearFocusTouched.add(Color.red(pixel));
+//                Log.d("anbt","red value (real): " + Color.red(pixel));
+//                Log.d("anbt","red value (virtual):" + RGBValueNearFocusTouched.get(0));
+//                return false;
+//            }
+//        });
+
+
     }
 }

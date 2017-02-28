@@ -1,7 +1,11 @@
 package tw.ncnu.viplab.multifocusimage;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 
 import org.opencv.android.Utils;
@@ -257,7 +261,7 @@ public class PresenterMainActivity {
 
         Imgproc.blur(processedMat1_Binary,processedMat1_detectedEdges, new Size(3,3));
         double threshold = 50;
-        Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*3,3,false);
+        Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*2,3,false);
 
 //        Imgproc.findContours(processedMat1_detectedEdges.clone(),contours,hierarchy,Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
 //        hierarchy.release();
@@ -280,5 +284,42 @@ public class PresenterMainActivity {
         ShowImage(processedImageView1, processedMat1);
         ShowImage(processedImageView2, processedMat1_detectedEdges);
         // ShowImage(processedImageView2, drawing);
+    }
+
+    public void Progress2017FebWeek4(){
+        //onTouchImageView(processedImageView1,processedImageView2);
+    }
+    public void onTouchImageView(){
+        final List<Integer> RGBValueNearFocusTouched = new ArrayList<>();
+        final List<Integer> RGBValueFarFocusTouched = new ArrayList<>();
+        final Bitmap bitmapNearFocus = ((BitmapDrawable)processedImageView1.getDrawable()).getBitmap();
+        final Bitmap bitmapFarFocus = ((BitmapDrawable)processedImageView2.getDrawable()).getBitmap();
+        processedImageView1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int pixel = bitmapNearFocus.getPixel((int)motionEvent.getX(),(int)motionEvent.getY());
+                RGBValueNearFocusTouched.clear();
+                RGBValueNearFocusTouched.add(Color.red(pixel));
+                RGBValueNearFocusTouched.add(Color.green(pixel));
+                RGBValueNearFocusTouched.add(Color.blue(pixel));
+                Log.d("anbt","RGB Value touched of Near Focus Image: ["+ RGBValueNearFocusTouched.get(0) + "," + RGBValueNearFocusTouched.get(1) + "," + RGBValueNearFocusTouched.get(2) + "]");
+                return false;
+            }
+        });
+        processedImageView2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int pixel = bitmapFarFocus.getPixel((int)motionEvent.getX(),(int)motionEvent.getY());
+                RGBValueFarFocusTouched.clear();
+                RGBValueFarFocusTouched.add(Color.red(pixel));
+                RGBValueFarFocusTouched.add(Color.green(pixel));
+                RGBValueFarFocusTouched.add(Color.blue(pixel));
+                Log.d("anbt","RGB Value touched of Far Focus Image: ["+ RGBValueFarFocusTouched.get(0) + "," + RGBValueFarFocusTouched.get(1) + "," + RGBValueFarFocusTouched.get(2) + "]");
+                return false;
+            }
+        });
+
+
+
     }
 }
