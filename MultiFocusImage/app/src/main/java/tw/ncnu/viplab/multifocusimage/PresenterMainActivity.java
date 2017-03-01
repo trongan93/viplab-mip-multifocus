@@ -253,15 +253,52 @@ public class PresenterMainActivity {
 
        //Image Segmentation
         Mat processedMat1_Binary = new Mat();
+        Mat processedMat2_Binary = new Mat();
+
         Mat processedMat1_detectedEdges = new Mat();
+        Mat processedMat2_detectedEdges = new Mat();
+
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Mat hierarchy = new Mat();
-
         Imgproc.cvtColor(inputMat1, processedMat1_Binary, Imgproc.COLOR_RGBA2GRAY);
-
+        Imgproc.cvtColor(inputMat2, processedMat2_Binary, Imgproc.COLOR_RGB2GRAY);
         Imgproc.blur(processedMat1_Binary,processedMat1_detectedEdges, new Size(3,3));
+        Imgproc.blur(processedMat2_Binary,processedMat2_detectedEdges, new Size(3,3));
         double threshold = 50;
-        Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*2,3,false);
+        Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*3,3,false);
+        Imgproc.Canny(processedMat2_detectedEdges,processedMat2_detectedEdges,threshold,threshold*3,3,false);
+
+        Mat map2DetectedEdges = new Mat(processedMat1_detectedEdges.size(), CvType.CV_8U);
+        if(processedMat1_detectedEdges.size().equals(processedMat2_detectedEdges.size()))
+        {
+            Log.d("anbt","2 Edges Object is the same size");
+            for(int row = 0; row < processedMat1_detectedEdges.rows(); row++){
+                for(int col = 0 ; col < processedMat1_detectedEdges.cols();col++){
+                    double valueNearFocus = processedMat1_detectedEdges.get(row,col)[0];
+                    double valueFarFocus = processedMat2_detectedEdges.get(row,col)[0];
+                    if(valueNearFocus > 0){
+                        map2DetectedEdges.put(row,col,1);
+                        Log.d("anbt-Near",String.format("value at (%1s,%2s): %3s)",row,col,map2DetectedEdges.get(row,col)[0]));
+                    }
+                    else if(valueFarFocus > 0){
+                        map2DetectedEdges.put(row,col,0);
+                        Log.d("anbt-Far",String.format("value at (%1s,%2s): %3s)",row,col,map2DetectedEdges.get(row,col)[0]));
+                    }
+                    else{
+                        map2DetectedEdges.put(row,col,0.5);
+                        Log.d("anbt-Mid",String.format("value at (%1s,%2s): %3s)",row,col,map2DetectedEdges.get(row,col)[0]));
+                    }
+                }
+            }
+        }
+        else
+        {
+            Log.d("anbt","2 Edges Object isn't the same size");
+        }
+        printMatBinaryObject(map2DetectedEdges);
+
+
+
 
 //        Imgproc.findContours(processedMat1_detectedEdges.clone(),contours,hierarchy,Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
 //        hierarchy.release();
@@ -281,10 +318,14 @@ public class PresenterMainActivity {
 //        }
 //        descriptorMatcher.match(descriptors1,drawing,matches);
 
-        ShowImage(processedImageView1, processedMat1);
-        ShowImage(processedImageView2, processedMat1_detectedEdges);
+
+
+        ShowImage(processedImageView1, processedMat1_detectedEdges);
+        ShowImage(processedImageView2, processedMat2_detectedEdges);
         // ShowImage(processedImageView2, drawing);
     }
+
+
 
     public void Progress2017FebWeek4(){
         //onTouchImageView(processedImageView1,processedImageView2);
@@ -318,8 +359,16 @@ public class PresenterMainActivity {
                 return false;
             }
         });
+    }
 
-
-
+    private void printMatBinaryObject(Mat inputBinaryMat){
+        String result = "";
+        for(int row = 0; row < inputBinaryMat.rows(); row++){
+            for(int col = 0; col < inputBinaryMat.cols(); col++){
+                String.format("{0} {1}", result, inputBinaryMat.get(row,col)[0]);
+            }
+            String.format("{0}\n",result);
+        }
+        Log.d("anbt",String.format("\n{0}",result));
     }
 }
