@@ -238,6 +238,20 @@ public class PresenterMainActivity {
 
         Mat descriptors1 = new Mat();
         Mat descriptors2 = new Mat();
+    }
 
+    public void ImageFusion(){
+
+    }
+    private double SpatialFrequency(Mat sourceMat1, Mat sourceMat2){
+        double sf = 0;
+        int tmp_rf = 0;
+        for(int n1 = 0; n1 < sourceMat1.rows();n1++){
+            for(int n2 = 0; n2 < sourceMat1.cols(); n2++){
+                sourceMat1. -sourceMat1.get(n1-1,n2)
+            }
+        }
+        double rf = Math.sqrt((1/(sourceMat1.rows() * sourceMat1.cols()))*tmp_rf);
+        return sf;
     }
 }
