@@ -264,11 +264,13 @@ public class PresenterMainActivity {
         Imgproc.cvtColor(inputMat2, processedMat2_Binary, Imgproc.COLOR_RGB2GRAY);
         Imgproc.blur(processedMat1_Binary,processedMat1_detectedEdges, new Size(3,3));
         Imgproc.blur(processedMat2_Binary,processedMat2_detectedEdges, new Size(3,3));
-        double threshold = 50;
+        double threshold = 40;
         Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*3,3,false);
         Imgproc.Canny(processedMat2_detectedEdges,processedMat2_detectedEdges,threshold,threshold*3,3,false);
 
-        Mat map2DetectedEdges = new Mat(processedMat1_detectedEdges.size(), CvType.CV_8U);
+//        Mat map2DetectedEdges = new Mat(processedMat1_detectedEdges.size(), CvType.CV_8U);
+
+        float[][] T_Object = new float[processedMat1_detectedEdges.rows()][processedMat1_detectedEdges.cols()];//new process
         if(processedMat1_detectedEdges.size().equals(processedMat2_detectedEdges.size()))
         {
             Log.d("anbt","2 Edges Object is the same size");
@@ -277,16 +279,16 @@ public class PresenterMainActivity {
                     double valueNearFocus = processedMat1_detectedEdges.get(row,col)[0];
                     double valueFarFocus = processedMat2_detectedEdges.get(row,col)[0];
                     if(valueNearFocus > 0){
-                        map2DetectedEdges.put(row,col,1);
-                        Log.d("anbt-Near",String.format("value at (%1s,%2s): %3s)",row,col,map2DetectedEdges.get(row,col)[0]));
+//                        map2DetectedEdges.put(row,col,0);
+                        T_Object[row][col] = 1; //new process
                     }
                     else if(valueFarFocus > 0){
-                        map2DetectedEdges.put(row,col,0);
-                        Log.d("anbt-Far",String.format("value at (%1s,%2s): %3s)",row,col,map2DetectedEdges.get(row,col)[0]));
+//                        map2DetectedEdges.put(row,col,255);
+                        T_Object[row][col] = 0; //new process
                     }
                     else{
-                        map2DetectedEdges.put(row,col,0.5);
-                        Log.d("anbt-Mid",String.format("value at (%1s,%2s): %3s)",row,col,map2DetectedEdges.get(row,col)[0]));
+//                        map2DetectedEdges.put(row,col,128);
+                        T_Object[row][col] = 0.5f;//new process
                     }
                 }
             }
@@ -295,8 +297,8 @@ public class PresenterMainActivity {
         {
             Log.d("anbt","2 Edges Object isn't the same size");
         }
-        printMatBinaryObject(map2DetectedEdges);
-
+//        printMatBinaryObject(map2DetectedEdges);
+//        printMatrix(T_Object,processedMat1_detectedEdges.rows(),processedMat1_detectedEdges.cols());
 
 
 
@@ -361,14 +363,39 @@ public class PresenterMainActivity {
         });
     }
 
+    private double calculator(Mat inputImage){
+        double SF = 0;
+        for(int row = 0; row < inputImage.rows(); row++){
+            for(int col = 0; col < inputImage.cols(); col++){
+                double square
+            }
+        }
+    }
+
     private void printMatBinaryObject(Mat inputBinaryMat){
         String result = "";
         for(int row = 0; row < inputBinaryMat.rows(); row++){
             for(int col = 0; col < inputBinaryMat.cols(); col++){
-                String.format("{0} {1}", result, inputBinaryMat.get(row,col)[0]);
+               result = String.format("%s %f", result, inputBinaryMat.get(row,col)[0]);
             }
-            String.format("{0}\n",result);
+            result = String.format("%s\n",result);
         }
-        Log.d("anbt",String.format("\n{0}",result));
+        Log.d("anbt",result);
+    }
+    private void printMatrix(float[][] inputFloatMatrix, int rows, int cols){
+
+        for(int row = 0; row < rows; row++){
+            for(int col = 0; col < cols; col++){
+                if(inputFloatMatrix[row][col] == 1){
+                    Log.d("anbt", "Near" + inputFloatMatrix[row][col]);
+                }
+                else if(inputFloatMatrix[row][col] == 0){
+                    Log.d("anbt", "Far" + inputFloatMatrix[row][col]);
+                }
+                else{
+                    Log.d("anbt", "Mid" + inputFloatMatrix[row][col]);
+                }
+            }
+        }
     }
 }
