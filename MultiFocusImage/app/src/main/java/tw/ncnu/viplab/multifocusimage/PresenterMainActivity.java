@@ -319,7 +319,8 @@ public class PresenterMainActivity {
 //            Imgproc.drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, new Point());
 //        }
 //        descriptorMatcher.match(descriptors1,drawing,matches);
-
+        double SFValue = calculatorSF(inputMat1);
+        Log.d("anbt","SF value: " + SFValue);
 
 
         ShowImage(processedImageView1, processedMat1_detectedEdges);
@@ -363,13 +364,30 @@ public class PresenterMainActivity {
         });
     }
 
-    private double calculator(Mat inputImage){
+    private double calculatorSF(Mat inputImage){
         double SF = 0;
-        for(int row = 0; row < inputImage.rows(); row++){
-            for(int col = 0; col < inputImage.cols(); col++){
-                double square
+        int rows = inputImage.rows();
+        int cols = inputImage.cols();
+        double squareRowFrequency = 0, squareColFrequency = 0;
+        //N1 = rows; N2 = cols
+        for(int row = 0; row < rows; row++){
+            for(int col = 1; col < cols; col++){
+                double pixelValueI1Row = inputImage.get(row,col)[0];//Only Get R value in Pixel Values
+                double pixelValueI2Row = inputImage.get(row,col-1)[0];//Only Get R value in Pixel Values
+                squareRowFrequency += Math.pow((pixelValueI1Row - pixelValueI2Row),2);
             }
         }
+        squareRowFrequency = squareRowFrequency * (1f/(rows * cols));
+        for(int row = 1; row <rows;row++){
+            for(int col = 0; col <cols; col++){
+                double pixelValueI1Col = inputImage.get(row,col)[0];//Only Get R value in Pixel Values
+                double pixelValueI2Col = inputImage.get(row-1,col)[0];//Only Get R value in Pixel Values
+                squareColFrequency += Math.pow((pixelValueI1Col-pixelValueI2Col),2);
+            }
+        }
+        squareColFrequency = squareColFrequency * (1f/(rows * cols));
+        SF = Math.sqrt(squareRowFrequency + squareColFrequency);
+        return SF;
     }
 
     private void printMatBinaryObject(Mat inputBinaryMat){
@@ -397,5 +415,23 @@ public class PresenterMainActivity {
                 }
             }
         }
+    }
+
+    private static Mat minimusOfMat(Mat inputMatA, Mat inputMatB){
+        Mat result = new Mat(inputMatA.size(),CvType.CV_8U);
+        for(int row = 0; row < result.rows(); row++){
+            for(int col = 0; col < result.cols(); col++){
+                double[] pixelsValueA = inputMatA.get(row,col);
+                double[] pixelsValueB = inputMatB.get(row,col);
+                if(pixelsValueA.length == pixelsValueB.length){
+                    double[] pixelsValueSum = new double[pixelsValueA.length];
+                    for(int i = 0; i < pixelsValueA.length; i++){
+                        pixelsValueSum[i] = pixelsValueA[i] + pixelsValueB[i];
+                    }
+                    result.put(row,col,pixelsValueSum);
+                }
+            }
+        }
+        return result;
     }
 }

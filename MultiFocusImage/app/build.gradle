@@ -18,6 +18,10 @@ android {
         }
     }
     sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jniLibs/'] } }
+    dexOptions {
+        incremental true
+        javaMaxHeapSize "2g"//OPtimize RAM when run APP
+    }
 }
 
 dependencies {
