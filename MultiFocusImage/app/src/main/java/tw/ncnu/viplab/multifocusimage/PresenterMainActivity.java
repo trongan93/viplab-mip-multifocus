@@ -137,11 +137,11 @@ public class PresenterMainActivity {
 
 
         //Apply watershed
-        processedMat1 = applyWaterShed(inputMat1);
-        processedMat2 = applyWaterShed(inputMat2);
+        Mat waterShedMat1 = applyWaterShed(inputMat1);
+        Mat waterShedMat2 = applyWaterShed(inputMat2);
         //Show Image
-        ShowImage(processedImageView1, processedMat1);
-        ShowImage(processedImageView2, processedMat2);
+        ShowImage(processedImageView1, waterShedMat1);
+        ShowImage(processedImageView2, waterShedMat2);
 
 
     }
@@ -149,23 +149,25 @@ public class PresenterMainActivity {
     private Mat applyWaterShed(Mat mRgba) {
         Mat result;
         try {
-            Mat threeChannel = new Mat();
-            Imgproc.cvtColor(mRgba, threeChannel, Imgproc.COLOR_BGR2GRAY);
-            Imgproc.threshold(threeChannel, threeChannel, 100, 255, Imgproc.THRESH_BINARY);
+//            Imgproc.cvtColor(mRgba,mRgba, Imgproc.COLOR_BGR2GRAY);
+            Imgproc.threshold(mRgba, mRgba, 40, 120, Imgproc.THRESH_BINARY);
+            Mat marker = new Mat(mRgba.size(), CvType.CV_8U);
+            Imgproc.watershed(mRgba,marker);
+            result = marker;
 
-            // Eliminate noise and smaller objects
-            Mat fg = new Mat(mRgba.size(), CvType.CV_8U);
-            Imgproc.erode(threeChannel, fg, new Mat(), new Point(-1, -1), 2);
-
-            // Identify image pixels without objects
-            Mat bg = new Mat(mRgba.size(), CvType.CV_8U);
-            Imgproc.dilate(threeChannel, bg, new Mat(), new Point(-1, -1), 3);
-            Imgproc.threshold(bg, bg, 1, 128, Imgproc.THRESH_BINARY_INV);
+//            // Eliminate noise and smaller objects
+//            Mat fg = new Mat(mRgba.size(), CvType.CV_8U);
+//            Imgproc.erode(mRgba, fg, new Mat(), new Point(-1, -1), 2);
+//
+//            // Identify image pixels without objects
+//            Mat bg = new Mat(mRgba.size(), CvType.CV_8U);
+//            Imgproc.dilate(mRgba, bg, new Mat(), new Point(-1, -1), 3);
+//            Imgproc.threshold(bg, bg, 0, 128, Imgproc.THRESH_BINARY_INV);
 
 
             // Create markers image
-            Mat marker = new Mat(mRgba.size(), CvType.CV_8U, new Scalar(0));
-            Core.add(fg, bg, marker);
+//            Mat marker = new Mat(mRgba.size(), CvType.CV_8U);
+//            Core.add(fg, bg, marker);
 
 
 //            //Convert Image to gray Image
@@ -194,8 +196,8 @@ public class PresenterMainActivity {
 //            Core.add(sure_fg, sure_bg, marker , new Mat(), CvType.CV_8U);
 
             // Create watershed segmentation object
-            WatershedSegmenter.setMarkers(marker);
-            result = WatershedSegmenter.process(mRgba);
+//            WatershedSegmenter.setMarkers(marker);
+//            result = WatershedSegmenter.process(mRgba);
         } catch (Exception e) {
             result = mRgba;
             Log.d("anbt", "Fail Apply WaterShed");
@@ -248,9 +250,6 @@ public class PresenterMainActivity {
 
 //        Mat H1 = Calib3d.findHomography(processedMat2, processedMat1);
 
-        Log.d("trongan93","Image 1 - Descripter Size: " + descriptors1.size());
-        Log.d("trongan93","Image 2 - Descripter Size: " + descriptors2.size());
-
        //Image Segmentation
         Mat processedMat1_Binary = new Mat();
         Mat processedMat2_Binary = new Mat();
@@ -267,6 +266,12 @@ public class PresenterMainActivity {
         double threshold = 40;
         Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*3,3,false);
         Imgproc.Canny(processedMat2_detectedEdges,processedMat2_detectedEdges,threshold,threshold*3,3,false);
+
+        Mat processedMat1_WaterShedApplied = new Mat();
+        Mat processedMat2_WaterShedApplied = new Mat();
+
+        processedMat1_WaterShedApplied = applyWaterShed(inputMat1);
+        processedMat2_WaterShedApplied = applyWaterShed(inputMat2);
 
 //        Mat map2DetectedEdges = new Mat(processedMat1_detectedEdges.size(), CvType.CV_8U);
 
@@ -319,16 +324,20 @@ public class PresenterMainActivity {
 //            Imgproc.drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, new Point());
 //        }
 //        descriptorMatcher.match(descriptors1,drawing,matches);
-        double SFValue = calculatorSF(inputMat1);
-        Log.d("anbt","SF value: " + SFValue);
 
 
-        ShowImage(processedImageView1, processedMat1_detectedEdges);
-        ShowImage(processedImageView2, processedMat2_detectedEdges);
+        //Calculate SF
+//        double SFValue = calculatorSF(inputMat1);
+//        Log.d("anbt","SF value: " + SFValue);
+
+
+//        ShowImage(processedImageView1, processedMat1_detectedEdges);
+//        ShowImage(processedImageView2, processedMat2_detectedEdges);
         // ShowImage(processedImageView2, drawing);
+
+        ShowImage(processedImageView1, processedMat1_WaterShedApplied);
+        ShowImage(processedImageView2, processedMat2_WaterShedApplied);
     }
-
-
 
     public void Progress2017FebWeek4(){
         //onTouchImageView(processedImageView1,processedImageView2);
