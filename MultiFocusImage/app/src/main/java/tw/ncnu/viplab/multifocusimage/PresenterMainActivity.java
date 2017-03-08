@@ -17,7 +17,9 @@ import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.features2d.DescriptorExtractor;
@@ -330,13 +332,23 @@ public class PresenterMainActivity {
 //        double SFValue = calculatorSF(inputMat1);
 //        Log.d("anbt","SF value: " + SFValue);
 
+//        ShowImage(processedImageView1, processedMat1);
+//        ShowImage(processedImageView2, processedMat2);
 
-//        ShowImage(processedImageView1, processedMat1_detectedEdges);
-//        ShowImage(processedImageView2, processedMat2_detectedEdges);
+        ShowImage(processedImageView1, processedMat1_detectedEdges);
+        ShowImage(processedImageView2, processedMat2_detectedEdges);
         // ShowImage(processedImageView2, drawing);
 
-        ShowImage(processedImageView1, processedMat1_WaterShedApplied);
-        ShowImage(processedImageView2, processedMat2_WaterShedApplied);
+//        ShowImage(processedImageView1, processedMat1_WaterShedApplied);
+//        ShowImage(processedImageView2, processedMat2_WaterShedApplied);
+
+//        //Apply detection
+//        Mat destinationMat1 = new Mat();
+//        Mat destinationMat2 = new Mat();
+//        applyDetection(inputMat1, destinationMat1);
+//        applyDetection(inputMat2, destinationMat2);
+//        ShowImage(processedImageView1, destinationMat1);
+//        ShowImage(processedImageView2, destinationMat2);
     }
 
     public void Progress2017FebWeek4(){
@@ -442,5 +454,60 @@ public class PresenterMainActivity {
             }
         }
         return result;
+    }
+
+    private static Mat drawObjectWithKeypoints(MatOfKeyPoint keyPoints){
+        Mat result = new Mat();
+
+        return result;
+    }
+
+    public void applyDetection(Mat src, Mat dst) {
+        if (dst != src) {
+            src.copyTo(dst);
+        }
+        Mat img_gray,img_sobel, img_threshold, element;
+
+        img_gray=new Mat();
+        Imgproc.cvtColor(src, img_gray, Imgproc.COLOR_RGB2GRAY);
+
+        img_sobel=new Mat();
+        Imgproc.Sobel(img_gray, img_sobel, CvType.CV_8U, 1, 0, 3, 1, 0,Core.BORDER_DEFAULT);
+
+        img_threshold=new Mat();
+        Imgproc.threshold(img_sobel, img_threshold, 0, 255, Imgproc.THRESH_OTSU+Imgproc.THRESH_BINARY);
+
+        element=new Mat();
+        element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(17, 3) );
+        Imgproc.morphologyEx(img_threshold, img_threshold, Imgproc.MORPH_CLOSE, element);
+        //Does the trick
+        List<MatOfPoint>  contours=new ArrayList<MatOfPoint>();
+        Mat hierarchy = new Mat();
+        Imgproc.findContours(img_threshold, contours, hierarchy, 0, 1);
+        List<MatOfPoint> contours_poly=new ArrayList<MatOfPoint>(contours.size());
+        contours_poly.addAll(contours);
+
+        MatOfPoint2f mMOP2f1,mMOP2f2;
+        mMOP2f1=new MatOfPoint2f();
+        mMOP2f2=new MatOfPoint2f();
+
+        for( int i = 0; i < contours.size(); i++ )
+
+            if (contours.get(i).toList().size()>100)
+            {
+                contours.get(i).convertTo(mMOP2f1, CvType.CV_32FC2);
+                Imgproc.approxPolyDP(mMOP2f1,mMOP2f2, 3, true );
+                mMOP2f2.convertTo(contours_poly.get(i), CvType.CV_32S);
+                Rect appRect=Imgproc.boundingRect(contours_poly.get(i));
+                if (appRect.width>appRect.height)
+                {
+                    Imgproc.rectangle(dst, new Point(appRect.x,appRect.y) ,new Point(appRect.x+appRect.width,appRect.y+appRect.height), new Scalar(255,0,0));
+                }
+            }
+
+    }
+
+    public void GetRGBFromPixelValue(Mat matInput, double[] RGBValues ){
+        
     }
 }
