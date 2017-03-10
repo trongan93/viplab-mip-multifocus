@@ -8,13 +8,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
-import org.opencv.android.Utils;
-import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
+import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
@@ -23,11 +20,9 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.features2d.DescriptorExtractor;
-import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
 
 
 import java.util.ArrayList;
@@ -35,7 +30,7 @@ import java.util.List;
 
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
-import tw.ncnu.viplab.multifocusimage.ImageProcessing.WatershedSegmenter;
+
 import static org.opencv.core.Mat.zeros;
 
 /**
@@ -269,11 +264,11 @@ public class PresenterMainActivity {
         Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*3,3,false);
         Imgproc.Canny(processedMat2_detectedEdges,processedMat2_detectedEdges,threshold,threshold*3,3,false);
 
-        Mat processedMat1_WaterShedApplied = new Mat();
-        Mat processedMat2_WaterShedApplied = new Mat();
-
-        processedMat1_WaterShedApplied = applyWaterShed(inputMat1);
-        processedMat2_WaterShedApplied = applyWaterShed(inputMat2);
+//        Mat processedMat1_WaterShedApplied = new Mat();
+//        Mat processedMat2_WaterShedApplied = new Mat();
+//
+//        processedMat1_WaterShedApplied = applyWaterShed(inputMat1);
+//        processedMat2_WaterShedApplied = applyWaterShed(inputMat2);
 
 //        Mat map2DetectedEdges = new Mat(processedMat1_detectedEdges.size(), CvType.CV_8U);
 
@@ -335,8 +330,8 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, processedMat1);
 //        ShowImage(processedImageView2, processedMat2);
 
-        ShowImage(processedImageView1, processedMat1_detectedEdges);
-        ShowImage(processedImageView2, processedMat2_detectedEdges);
+//        ShowImage(processedImageView1, processedMat1_detectedEdges);
+//        ShowImage(processedImageView2, processedMat2_detectedEdges);
         // ShowImage(processedImageView2, drawing);
 
 //        ShowImage(processedImageView1, processedMat1_WaterShedApplied);
@@ -349,6 +344,14 @@ public class PresenterMainActivity {
 //        applyDetection(inputMat2, destinationMat2);
 //        ShowImage(processedImageView1, destinationMat1);
 //        ShowImage(processedImageView2, destinationMat2);
+
+        //Check Keypoint
+        double[] RGBs = new double[3];
+        DrawingKeyPointFeatureTheSameRGB(inputMat1,keypoints1);
+        DrawingKeyPointFeatureTheSameRGB(inputMat2, keypoints2);
+        ShowImage(processedImageView1, inputMat1);
+        ShowImage(processedImageView2, inputMat2);
+
     }
 
     public void Progress2017FebWeek4(){
@@ -507,7 +510,22 @@ public class PresenterMainActivity {
 
     }
 
-    public void GetRGBFromPixelValue(Mat matInput, double[] RGBValues ){
-        
+    public void DrawingKeyPointFeatureTheSameRGB(Mat matInput, MatOfKeyPoint matOfKeyPoint){
+        KeyPoint[] keyPoints = matOfKeyPoint.toArray();
+        List<Point> points = new ArrayList<>();
+        for (int i = 0; i < keyPoints.length; i++)
+        {
+            if(null != keyPoints[i].pt) {
+                points.add(keyPoints[i].pt);
+            }
+        }
+        for (int i = 0; i < points.size(); i++){
+
+            if(i > 0){
+                Scalar intensity = matInput.at<uchar>(Point(x, y));
+                Imgproc.line(matInput,points.get(i-1),points.get(i),new Scalar(0,255,0));
+
+            }
+        }
     }
 }
