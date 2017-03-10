@@ -511,20 +511,32 @@ public class PresenterMainActivity {
     }
 
     public void DrawingKeyPointFeatureTheSameRGB(Mat matInput, MatOfKeyPoint matOfKeyPoint){
-        KeyPoint[] keyPoints = matOfKeyPoint.toArray();
-        List<Point> points = new ArrayList<>();
-        for (int i = 0; i < keyPoints.length; i++)
-        {
-            if(null != keyPoints[i].pt) {
-                points.add(keyPoints[i].pt);
-            }
-        }
-        for (int i = 0; i < points.size(); i++){
+//       //Draw match all keypoint
+//        KeyPoint[] keyPoints = matOfKeyPoint.toArray();
+//        List<Point> points = new ArrayList<>();
+//        for (int i = 0; i < keyPoints.length; i++)
+//        {
+//            if(null != keyPoints[i].pt) {
+//                points.add(keyPoints[i].pt);
+//            }
+//        }
+//        for (int i = 0; i < points.size(); i++){
+//            if(i > 0){
+//                Imgproc.line(matInput,points.get(i-1),points.get(i),new Scalar(0,255,0));
+//            }
+////            double[] rgbValue = matInput.get((int)points.get(i).x,(int)points.get(i).y);
+////            Log.d("anbt","RBG of Keypoint at ["+points.get(i).x+","+points.get(i).y+"] = ["+rgbValue[0]+","+rgbValue[1]+","+rgbValue[2]+"]");
+//            Point p = points.get(i);
+//        }
 
-            if(i > 0){
-                Scalar intensity = matInput.at<uchar>(Point(x, y));
-                Imgproc.line(matInput,points.get(i-1),points.get(i),new Scalar(0,255,0));
+        //Define region
+        Log.d("anbt","Size Of Mat: cols = " + matInput.cols() + ", rows = " + matInput.rows());
+        Log.d("anbt","Size Of Mat Of Keypoint: cols = " + matOfKeyPoint.cols() + ", rows = " + matOfKeyPoint.rows());
+        for(int matOfKbCol = 0; matOfKbCol < matOfKeyPoint.cols(); matOfKbCol++){
+            for (int matOfKbRow = 0; matOfKbRow < matOfKeyPoint.rows(); matOfKbRow++){
+                if(matOfKeyPoint.get(matOfKbRow,matOfKbCol).length > 0){
 
+                }
             }
         }
     }
