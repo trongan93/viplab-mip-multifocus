@@ -23,6 +23,7 @@ import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.utils.Converters;
 
 
 import java.util.ArrayList;
@@ -347,11 +348,14 @@ public class PresenterMainActivity {
 
         //Check Keypoint
         double[] RGBs = new double[3];
-        DrawingKeyPointFeatureTheSameRGB(inputMat1,keypoints1);
-        DrawingKeyPointFeatureTheSameRGB(inputMat2, keypoints2);
-        ShowImage(processedImageView1, inputMat1);
-        ShowImage(processedImageView2, inputMat2);
-
+//        DrawingKeyPointFeatureTheSameRGB(inputMat1,keypoints1);
+//        DrawingKeyPointFeatureTheSameRGB(inputMat2, keypoints2);
+//        ShowImage(processedImageView1, inputMat1);
+//        ShowImage(processedImageView2, inputMat2);
+        Mat matKeypoints1 = MappingListPointsToMat(keypoints1);
+        Mat matKeypoints2 = MappingListPointsToMat(keypoints1);
+        ShowImage(processedImageView1, matKeypoints1);
+        ShowImage(processedImageView2, matKeypoints2);
     }
 
     public void Progress2017FebWeek4(){
@@ -520,14 +524,14 @@ public class PresenterMainActivity {
                 points.add(keyPoints[i].pt);
             }
         }
-        for (int i = 0; i < points.size(); i++){
-            if(i > 0){
-                Imgproc.line(matInput,points.get(i-1),points.get(i),new Scalar(0,255,0));
-            }
-//            double[] rgbValue = matInput.get((int)points.get(i).x,(int)points.get(i).y);
-//            Log.d("anbt","RBG of Keypoint at ["+points.get(i).x+","+points.get(i).y+"] = ["+rgbValue[0]+","+rgbValue[1]+","+rgbValue[2]+"]");
-            Point p = points.get(i);
-        }
+
+
+//        for (int i = 0; i < points.size(); i++){
+//            if(i > 0){
+//                Imgproc.line(matInput,points.get(i-1),points.get(i),new Scalar(0,255,0));
+//            }
+//
+//        }
 
 //        //Define region
 //        KeyPoint[] keyPoints = matOfKeyPoint.toArray();
@@ -543,5 +547,28 @@ public class PresenterMainActivity {
 //                }
 //            }
 //        }
+    }
+
+
+    private Mat MappingListPointsToMat(MatOfKeyPoint matOfKeyPoint){
+        KeyPoint[] keyPoints = matOfKeyPoint.toArray();
+        List<Point> points = new ArrayList<>();
+        for (int i = 0; i < keyPoints.length; i++)
+        {
+            if(null != keyPoints[i].pt) {
+                points.add(keyPoints[i].pt);
+            }
+        }
+//        Mat outputMat = Converters.vector_Point_to_Mat(points);
+        Mat outputMat = new Mat();
+        //Converters.vector_KeyPoint_to_Mat(matOfKeyPoint.toList()).convertTo(outputMat,CvType.CV_8U);
+        outputMat = Converters.vector_Point2d_to_Mat(points);
+        Mat output2 = new Mat();
+        outputMat.convertTo(output2,CvType.CV_8UC1);
+//        Imgproc.cvtColor(outputMat,outputMat,Imgproc.COLOR_GRAY2BGR);
+//        Imgproc.cvtColor(outputMat,outputMat,Imgproc.COLOR);
+        Log.d("anbt","Channel of Mat: " + outputMat.channels());
+        return outputMat;
+//        http://stackoverflow.com/questions/10137249/android-opencv-listkeypoint-to-mat
     }
 }
