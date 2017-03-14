@@ -348,14 +348,28 @@ public class PresenterMainActivity {
 
         //Check Keypoint
         double[] RGBs = new double[3];
-//        DrawingKeyPointFeatureTheSameRGB(inputMat1,keypoints1);
-//        DrawingKeyPointFeatureTheSameRGB(inputMat2, keypoints2);
-//        ShowImage(processedImageView1, inputMat1);
-//        ShowImage(processedImageView2, inputMat2);
-        Mat matKeypoints1 = MappingListPointsToMat(keypoints1);
-        Mat matKeypoints2 = MappingListPointsToMat(keypoints1);
-        ShowImage(processedImageView1, matKeypoints1);
-        ShowImage(processedImageView2, matKeypoints2);
+
+//        Mat mat1ForFillDetect = new Mat();
+//        Mat mat2ForFillDetect = new Mat();
+//        Imgproc.cvtColor(inputMat1, mat1ForFillDetect, Imgproc.COLOR_RGBA2GRAY);
+//        Imgproc.cvtColor(inputMat2, mat2ForFillDetect, Imgproc.COLOR_RGBA2GRAY);
+//        DrawingKeyPointFeatureTheSameRGB(mat1ForFillDetect,keypoints1);
+//        DrawingKeyPointFeatureTheSameRGB(mat2ForFillDetect, keypoints2);
+//        ShowImage(processedImageView1, mat1ForFillDetect);
+//        ShowImage(processedImageView2, mat2ForFillDetect);
+
+
+//        Mat matKeypoints1 = MappingListPointsToMat(keypoints1);
+//        Mat matKeypoints2 = MappingListPointsToMat(keypoints1);
+//        ShowImage(processedImageView1, matKeypoints1);
+//        ShowImage(processedImageView2, matKeypoints2);
+
+        Mat mat1DetectByColor = new Mat();
+        Mat mat2DetectByColor = new Mat();
+        mat1DetectByColor = DetectObjectByColor(inputMat1,new Scalar(0,100,100));
+        mat2DetectByColor = DetectObjectByColor(inputMat2, new Scalar(0,100,100));
+        ShowImage(processedImageView1, mat1DetectByColor);
+        ShowImage(processedImageView2, mat2DetectByColor);
     }
 
     public void Progress2017FebWeek4(){
@@ -526,12 +540,13 @@ public class PresenterMainActivity {
         }
 
 
-//        for (int i = 0; i < points.size(); i++){
-//            if(i > 0){
-//                Imgproc.line(matInput,points.get(i-1),points.get(i),new Scalar(0,255,0));
-//            }
-//
-//        }
+        for (int i = 0; i < points.size(); i++){
+            if(i > 0){
+                Imgproc.line(matInput,points.get(i-1),points.get(i),new Scalar(0,255,0));
+            }
+
+
+        }
 
 //        //Define region
 //        KeyPoint[] keyPoints = matOfKeyPoint.toArray();
@@ -570,5 +585,17 @@ public class PresenterMainActivity {
         Log.d("anbt","Channel of Mat: " + outputMat.channels());
         return outputMat;
 //        http://stackoverflow.com/questions/10137249/android-opencv-listkeypoint-to-mat
+    }
+
+    private Mat DetectObjectByColor(Mat input, Scalar scalar){
+        Imgproc.cvtColor(input,input,Imgproc.COLOR_RGBA2RGB);
+        Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2HSV);
+        Mat lower_red_hue_range = new Mat();
+//        Mat upper_red_hue_range = new Mat();
+        Core.inRange(input, new Scalar(0,100,100), new Scalar(350,255,255), lower_red_hue_range);
+//        Core.inRange(input, new Scalar(0, 100, 100), new Scalar(10, 255, 255), lower_red_hue_range);
+//        Core.inRange(input, new Scalar(10,255,255), new Scalar(0,100,100), lower_red_hue_range);
+//        Core.inRange(input, new Scalar(160, 100, 100), new Scalar(179, 255, 255), upper_red_hue_range);
+        return lower_red_hue_range;
     }
 }
