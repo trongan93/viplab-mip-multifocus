@@ -364,12 +364,21 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, matKeypoints1);
 //        ShowImage(processedImageView2, matKeypoints2);
 
-        Mat mat1DetectByColor = new Mat();
-        Mat mat2DetectByColor = new Mat();
-        mat1DetectByColor = DetectObjectByColor(inputMat1,new Scalar(0,100,100));
-        mat2DetectByColor = DetectObjectByColor(inputMat2, new Scalar(0,100,100));
-        ShowImage(processedImageView1, mat1DetectByColor);
-        ShowImage(processedImageView2, mat2DetectByColor);
+        //Detect Object by Color
+//        Mat mat1DetectByColor = new Mat();
+//        Mat mat2DetectByColor = new Mat();
+//        mat1DetectByColor = DetectObjectByColor(inputMat1,new Scalar(0,100,100));
+//        mat2DetectByColor = DetectObjectByColor(inputMat2, new Scalar(0,100,100));
+//        ShowImage(processedImageView1, mat1DetectByColor);
+//        ShowImage(processedImageView2, mat2DetectByColor);
+
+        //Get Heat Map
+//        Mat heatMap1 = new Mat();
+//        Mat heatMap2 = new Mat();
+//        heatMap1 = GetHeatMap(inputMat1);
+//        heatMap2 = GetHeatMap(inputMat2);
+//        ShowImage(processedImageView1,heatMap1);
+//        ShowImage(processedImageView2, heatMap2);
     }
 
     public void Progress2017FebWeek4(){
@@ -598,4 +607,14 @@ public class PresenterMainActivity {
 //        Core.inRange(input, new Scalar(160, 100, 100), new Scalar(179, 255, 255), upper_red_hue_range);
         return lower_red_hue_range;
     }
+    private Mat GetHeatMap(Mat inputMat)
+    {
+        Imgproc.cvtColor(inputMat, inputMat, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.applyColorMap(inputMat, inputMat, Imgproc.COLORMAP_JET);
+        return inputMat;
+    }
+
+//    private Mat DetectRegion(Mat inputMat){
+//        Imgproc.
+//    }
 }
