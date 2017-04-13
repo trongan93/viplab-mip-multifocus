@@ -22,7 +22,11 @@ import org.opencv.core.Size;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.objdetect.Objdetect;
+import org.opencv.photo.Photo;
 import org.opencv.utils.Converters;
 
 
@@ -265,41 +269,38 @@ public class PresenterMainActivity {
         Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*3,3,false);
         Imgproc.Canny(processedMat2_detectedEdges,processedMat2_detectedEdges,threshold,threshold*3,3,false);
 
-//        Mat processedMat1_WaterShedApplied = new Mat();
-//        Mat processedMat2_WaterShedApplied = new Mat();
-//
-//        processedMat1_WaterShedApplied = applyWaterShed(inputMat1);
-//        processedMat2_WaterShedApplied = applyWaterShed(inputMat2);
-
 //        Mat map2DetectedEdges = new Mat(processedMat1_detectedEdges.size(), CvType.CV_8U);
 
-        float[][] T_Object = new float[processedMat1_detectedEdges.rows()][processedMat1_detectedEdges.cols()];//new process
-        if(processedMat1_detectedEdges.size().equals(processedMat2_detectedEdges.size()))
-        {
-            Log.d("anbt","2 Edges Object is the same size");
-            for(int row = 0; row < processedMat1_detectedEdges.rows(); row++){
-                for(int col = 0 ; col < processedMat1_detectedEdges.cols();col++){
-                    double valueNearFocus = processedMat1_detectedEdges.get(row,col)[0];
-                    double valueFarFocus = processedMat2_detectedEdges.get(row,col)[0];
-                    if(valueNearFocus > 0){
-//                        map2DetectedEdges.put(row,col,0);
-                        T_Object[row][col] = 1; //new process
-                    }
-                    else if(valueFarFocus > 0){
-//                        map2DetectedEdges.put(row,col,255);
-                        T_Object[row][col] = 0; //new process
-                    }
-                    else{
-//                        map2DetectedEdges.put(row,col,128);
-                        T_Object[row][col] = 0.5f;//new process
-                    }
-                }
-            }
-        }
-        else
-        {
-            Log.d("anbt","2 Edges Object isn't the same size");
-        }
+        //Defin T Object
+//        float[][] T_Object = new float[processedMat1_detectedEdges.rows()][processedMat1_detectedEdges.cols()];//new process
+//        if(processedMat1_detectedEdges.size().equals(processedMat2_detectedEdges.size()))
+//        {
+//            Log.d("anbt","2 Edges Object is the same size");
+//            for(int row = 0; row < processedMat1_detectedEdges.rows(); row++){
+//                for(int col = 0 ; col < processedMat1_detectedEdges.cols();col++){
+//                    double valueNearFocus = processedMat1_detectedEdges.get(row,col)[0];
+//                    double valueFarFocus = processedMat2_detectedEdges.get(row,col)[0];
+//                    if(valueNearFocus > 0){
+////                        map2DetectedEdges.put(row,col,0);
+//                        T_Object[row][col] = 1; //new process
+//                    }
+//                    else if(valueFarFocus > 0){
+////                        map2DetectedEdges.put(row,col,255);
+//                        T_Object[row][col] = 0; //new process
+//                    }
+//                    else{
+////                        map2DetectedEdges.put(row,col,128);
+//                        T_Object[row][col] = 0.5f;//new process
+//                    }
+//                }
+//            }
+//        }
+//        else
+//        {
+//            Log.d("anbt","2 Edges Object isn't the same size");
+//        }
+
+
 //        printMatBinaryObject(map2DetectedEdges);
 //        printMatrix(T_Object,processedMat1_detectedEdges.rows(),processedMat1_detectedEdges.cols());
 
@@ -379,6 +380,25 @@ public class PresenterMainActivity {
 //        heatMap2 = GetHeatMap(inputMat2);
 //        ShowImage(processedImageView1,heatMap1);
 //        ShowImage(processedImageView2, heatMap2);
+
+
+        //De Noising
+//        Mat deNoisingImage1 = new Mat();
+//        Mat deNoisingImage2 = new Mat();
+//        deNoisingImage1 = DeNoisingImage(inputMat1);
+//        deNoisingImage2 = DeNoisingImage(inputMat2);
+//        ShowImage(processedImageView1, deNoisingImage1);
+//        ShowImage(processedImageView2, deNoisingImage2);
+
+        //Apply watershed to detect region
+        Mat appliedWaterShed1 = new Mat();
+        Mat appliedWaterShed2 = new Mat();
+        appliedWaterShed1 = steptowatershed(inputMat1);
+        appliedWaterShed2 = steptowatershed(inputMat2);
+        ShowImage(processedImageView1, appliedWaterShed1);
+        ShowImage(processedImageView2, appliedWaterShed2);
+
+
     }
 
     public void Progress2017FebWeek4(){
@@ -614,7 +634,54 @@ public class PresenterMainActivity {
         return inputMat;
     }
 
-//    private Mat DetectRegion(Mat inputMat){
-//        Imgproc.
-//    }
+    private Mat DeNoisingImage(Mat inputMat){
+        Imgproc.cvtColor(inputMat,inputMat, Imgproc.COLOR_RGBA2GRAY);
+        Photo.fastNlMeansDenoising(inputMat, inputMat);
+        return inputMat;
+    }
+
+    public Mat steptowatershed(Mat img)
+    {
+        Mat threeChannel = new Mat();
+
+        Imgproc.cvtColor(img, threeChannel, Imgproc.COLOR_BGR2GRAY);
+//        Imgproc.threshold(threeChannel, threeChannel, 100, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(threeChannel, threeChannel, 80, 180, Imgproc.THRESH_BINARY);
+
+        Mat fg = new Mat(img.size(),CvType.CV_8U);
+        Imgproc.erode(threeChannel,fg,new Mat());
+
+        Mat bg = new Mat(img.size(),CvType.CV_8U);
+        Imgproc.dilate(threeChannel,bg,new Mat());
+//        Imgproc.threshold(bg,bg,1, 128,Imgproc.THRESH_BINARY_INV);
+        Imgproc.threshold(bg,bg, 1, 90,Imgproc.THRESH_BINARY_INV);
+
+        Mat markers = new Mat(img.size(),CvType.CV_8U, new Scalar(0));
+        Core.add(fg, bg, markers);
+        Mat result1=new Mat();
+        WatershedSegmenter segmenter = new WatershedSegmenter();
+        segmenter.setMarkers(markers);
+
+        Imgproc.cvtColor(img, img, Imgproc.COLOR_RGBA2RGB);
+        result1 = segmenter.process(img);
+        return result1;
+    }
+
+    public class WatershedSegmenter
+    {
+        public Mat markers=new Mat();
+
+        public void setMarkers(Mat markerImage)
+        {
+
+            markerImage.convertTo(markers, CvType.CV_32SC1);
+        }
+
+        public Mat process(Mat image)
+        {
+            Imgproc.watershed(image,markers);
+            markers.convertTo(markers,CvType.CV_8U);
+            return markers;
+        }
+    }
 }
