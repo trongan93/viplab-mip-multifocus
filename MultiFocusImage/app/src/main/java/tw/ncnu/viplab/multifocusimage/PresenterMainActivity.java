@@ -22,10 +22,7 @@ import org.opencv.core.Size;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.CascadeClassifier;
-import org.opencv.objdetect.Objdetect;
 import org.opencv.photo.Photo;
 import org.opencv.utils.Converters;
 
@@ -36,6 +33,9 @@ import java.util.List;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
 
+import static org.opencv.core.Core.BORDER_DEFAULT;
+import static org.opencv.core.CvType.CV_32F;
+import static org.opencv.core.CvType.CV_8U;
 import static org.opencv.core.Mat.zeros;
 
 /**
@@ -253,21 +253,16 @@ public class PresenterMainActivity {
 //        Mat H1 = Calib3d.findHomography(processedMat2, processedMat1);
 
        //Image Segmentation
-        Mat processedMat1_Binary = new Mat();
-        Mat processedMat2_Binary = new Mat();
 
-        Mat processedMat1_detectedEdges = new Mat();
-        Mat processedMat2_detectedEdges = new Mat();
 
-        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-        Mat hierarchy = new Mat();
-        Imgproc.cvtColor(inputMat1, processedMat1_Binary, Imgproc.COLOR_RGBA2GRAY);
-        Imgproc.cvtColor(inputMat2, processedMat2_Binary, Imgproc.COLOR_RGB2GRAY);
-        Imgproc.blur(processedMat1_Binary,processedMat1_detectedEdges, new Size(3,3));
-        Imgproc.blur(processedMat2_Binary,processedMat2_detectedEdges, new Size(3,3));
-        double threshold = 40;
-        Imgproc.Canny(processedMat1_detectedEdges,processedMat1_detectedEdges,threshold,threshold*3,3,false);
-        Imgproc.Canny(processedMat2_detectedEdges,processedMat2_detectedEdges,threshold,threshold*3,3,false);
+        //Edge dectector
+        //Edge detection
+//        Mat processedMat1_detectedEdges = new Mat();
+//        Mat processedMat2_detectedEdges = new Mat();
+//        processedMat1_detectedEdges = EdgeDetector(inputMat1);
+//        processedMat2_detectedEdges = EdgeDetector(inputMat2);
+//        ShowImage(processedImageView1, processedMat1_detectedEdges);
+//        ShowImage(processedImageView2, processedMat2_detectedEdges);
 
 //        Mat map2DetectedEdges = new Mat(processedMat1_detectedEdges.size(), CvType.CV_8U);
 
@@ -391,14 +386,23 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView2, deNoisingImage2);
 
         //Apply watershed to detect region
-        Mat appliedWaterShed1 = new Mat();
-        Mat appliedWaterShed2 = new Mat();
-        appliedWaterShed1 = steptowatershed(inputMat1);
-        appliedWaterShed2 = steptowatershed(inputMat2);
-        ShowImage(processedImageView1, appliedWaterShed1);
-        ShowImage(processedImageView2, appliedWaterShed2);
+
+        //Best apply WaterShed
+//        Mat appliedWaterShed1 = new Mat();
+//        Mat appliedWaterShed2 = new Mat();
+//        appliedWaterShed1 = steptowatershed(inputMat1);
+//        appliedWaterShed2 = steptowatershed(inputMat2);
+//        ShowImage(processedImageView1, appliedWaterShed1);
+//        ShowImage(processedImageView2, appliedWaterShed2);
 
 
+        //Gradient 2nd
+        Mat processedMat1_gradient2 = new Mat();
+        Mat processedMat2_gradient2 = new Mat();
+        processedMat1_gradient2 = Gradient2nd(inputMat1);
+        processedMat2_gradient2 = Gradient2nd(inputMat2);
+        ShowImage(processedImageView1, processedMat1_gradient2);
+        ShowImage(processedImageView2, processedMat2_gradient2);
     }
 
     public void Progress2017FebWeek4(){
@@ -522,7 +526,7 @@ public class PresenterMainActivity {
         Imgproc.cvtColor(src, img_gray, Imgproc.COLOR_RGB2GRAY);
 
         img_sobel=new Mat();
-        Imgproc.Sobel(img_gray, img_sobel, CvType.CV_8U, 1, 0, 3, 1, 0,Core.BORDER_DEFAULT);
+        Imgproc.Sobel(img_gray, img_sobel, CvType.CV_8U, 1, 0, 3, 1, 0, BORDER_DEFAULT);
 
         img_threshold=new Mat();
         Imgproc.threshold(img_sobel, img_threshold, 0, 255, Imgproc.THRESH_OTSU+Imgproc.THRESH_BINARY);
@@ -684,4 +688,29 @@ public class PresenterMainActivity {
             return markers;
         }
     }
+
+    private Mat EdgeDetector(Mat inputMat){
+        Imgproc.cvtColor(inputMat, inputMat, Imgproc.COLOR_RGBA2GRAY);
+        Imgproc.blur(inputMat,inputMat, new Size(3,3));
+        double threshold = 10;
+        //Gradient 1st
+        Imgproc.Canny(inputMat,inputMat,threshold,threshold*3,3,false);
+
+//        //Gradient 2nd
+//        Imgproc.blur(inputMat, inputMat, new Size(5,5));
+//        Imgproc.Canny(inputMat, inputMat, threshold, threshold*3,5,true);
+        return inputMat;
+    }
+
+    private Mat Gradient2nd(Mat inputMat){
+//        Imgproc.Sobel(inputMat, inputMat, CvType.CV_8U, 1, 0, 5, 2, 0, BORDER_DEFAULT); //gradient X: dx = 1, dy = 0; gradient Y: dx = 0, dy = 1
+        int scale = 1;
+        int delta = 0;
+        int ddepth = CvType.CV_8U;
+        int maskSize = 5;
+        Imgproc.cvtColor(inputMat, inputMat, Imgproc.COLOR_RGBA2GRAY);
+        Imgproc.Sobel(inputMat, inputMat, ddepth,0,1,maskSize,scale,delta);
+        return inputMat;
+    }
+
 }
