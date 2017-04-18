@@ -388,21 +388,30 @@ public class PresenterMainActivity {
         //Apply watershed to detect region
 
         //Best apply WaterShed
-//        Mat appliedWaterShed1 = new Mat();
-//        Mat appliedWaterShed2 = new Mat();
-//        appliedWaterShed1 = steptowatershed(inputMat1);
-//        appliedWaterShed2 = steptowatershed(inputMat2);
-//        ShowImage(processedImageView1, appliedWaterShed1);
-//        ShowImage(processedImageView2, appliedWaterShed2);
+        Mat appliedWaterShed1 = new Mat();
+        Mat appliedWaterShed2 = new Mat();
+        appliedWaterShed1 = steptowatershed(inputMat1);
+        appliedWaterShed2 = steptowatershed(inputMat2);
+        ShowImage(processedImageView1, appliedWaterShed1);
+        ShowImage(processedImageView2, appliedWaterShed2);
 
 
         //Gradient 2nd
-        Mat processedMat1_gradient2 = new Mat();
-        Mat processedMat2_gradient2 = new Mat();
-        processedMat1_gradient2 = Gradient2nd(inputMat1);
-        processedMat2_gradient2 = Gradient2nd(inputMat2);
-        ShowImage(processedImageView1, processedMat1_gradient2);
-        ShowImage(processedImageView2, processedMat2_gradient2);
+//        Mat processedMat1_gradient2 = new Mat();
+//        Mat processedMat2_gradient2 = new Mat();
+//        processedMat1_gradient2 = Gradient2nd(inputMat1);
+//        processedMat2_gradient2 = Gradient2nd(inputMat2);
+//        ShowImage(processedImageView1, processedMat1_gradient2);
+//        ShowImage(processedImageView2, processedMat2_gradient2);
+
+
+        //Map Gradient 1st
+//        Mat processMat1_edgeStrenght = new Mat();
+//        Mat processMat2_edgeStrenght = new Mat();
+//        processMat1_edgeStrenght = CalculateMapStrength(inputMat1);
+//        processMat2_edgeStrenght = CalculateMapStrength(inputMat2);
+//        ShowImage(processedImageView1, processMat1_edgeStrenght);
+//        ShowImage(processedImageView2, processMat2_edgeStrenght);
     }
 
     public void Progress2017FebWeek4(){
@@ -649,16 +658,16 @@ public class PresenterMainActivity {
         Mat threeChannel = new Mat();
 
         Imgproc.cvtColor(img, threeChannel, Imgproc.COLOR_BGR2GRAY);
-//        Imgproc.threshold(threeChannel, threeChannel, 100, 255, Imgproc.THRESH_BINARY);
-        Imgproc.threshold(threeChannel, threeChannel, 80, 180, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(threeChannel, threeChannel, 100, 255, Imgproc.THRESH_BINARY);
+//        Imgproc.threshold(threeChannel, threeChannel, 80, 180, Imgproc.THRESH_BINARY);
 
         Mat fg = new Mat(img.size(),CvType.CV_8U);
         Imgproc.erode(threeChannel,fg,new Mat());
 
         Mat bg = new Mat(img.size(),CvType.CV_8U);
         Imgproc.dilate(threeChannel,bg,new Mat());
-//        Imgproc.threshold(bg,bg,1, 128,Imgproc.THRESH_BINARY_INV);
-        Imgproc.threshold(bg,bg, 1, 90,Imgproc.THRESH_BINARY_INV);
+        Imgproc.threshold(bg,bg,1, 128,Imgproc.THRESH_BINARY_INV);
+//        Imgproc.threshold(bg,bg, 1, 90,Imgproc.THRESH_BINARY_INV);
 
         Mat markers = new Mat(img.size(),CvType.CV_8U, new Scalar(0));
         Core.add(fg, bg, markers);
@@ -711,6 +720,24 @@ public class PresenterMainActivity {
         Imgproc.cvtColor(inputMat, inputMat, Imgproc.COLOR_RGBA2GRAY);
         Imgproc.Sobel(inputMat, inputMat, ddepth,0,1,maskSize,scale,delta);
         return inputMat;
+    }
+
+    private Mat CalculateMapStrength(Mat inputMat){
+        //Convert to grayscale
+        Imgproc.cvtColor(inputMat,inputMat, Imgproc.COLOR_RGBA2GRAY);
+        //Compute dx and dy derivatives
+        Mat dx = new Mat();
+        Mat dy = new Mat();
+        Imgproc.Sobel(inputMat, dx, CV_32F, 1, 0);
+        Imgproc.Sobel(inputMat, dy, CV_32F, 0, 1);
+        Core.convertScaleAbs(dx,dx);
+        Core.convertScaleAbs(dy,dy);
+        //Compute gradient
+//        Core.magnitude(dx, dy, inputMat);
+        Mat outputMat = new Mat();
+        Core.addWeighted(dx,0.5,dy,0.5,0,outputMat);
+//        Core.magnitude(dx, dy, outputMat);
+        return outputMat;
     }
 
 }
