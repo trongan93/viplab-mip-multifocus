@@ -414,8 +414,8 @@ public class PresenterMainActivity {
         //Compile watershed result and map gradient result
         Mat regionsOfImage1 = new Mat();
         Mat regionsOfImage2 = new Mat();
-        regionsOfImage1 = DetectRegionOfImage(processMat1_edgeStrenght,appliedWaterShed1);
-        regionsOfImage2 = DetectRegionOfImage(processMat2_edgeStrenght, appliedWaterShed2);
+        regionsOfImage1 = DetectRegionOfImage(inputMat1, processMat1_edgeStrenght,appliedWaterShed1);
+        regionsOfImage2 = DetectRegionOfImage(inputMat2, processMat2_edgeStrenght, appliedWaterShed2);
         ShowImage(processedImageView1,regionsOfImage1);
         ShowImage(processedImageView2,regionsOfImage2);
 
@@ -665,7 +665,7 @@ public class PresenterMainActivity {
     {
         Mat threeChannel = new Mat();
         Imgproc.cvtColor(img, threeChannel, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.threshold(threeChannel, threeChannel, 100, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(threeChannel, threeChannel, 42, 255, Imgproc.THRESH_BINARY);
         Mat fg = new Mat(img.size(),CvType.CV_8U);
         int erosion_size = 3;
         Mat elementEroding = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*erosion_size + 1, 2*erosion_size+1));
@@ -701,6 +701,7 @@ public class PresenterMainActivity {
             markers.convertTo(markers,CvType.CV_8U);
             return markers;
         }
+
     }
 
     private Mat EdgeDetector(Mat inputMat){
@@ -751,9 +752,16 @@ public class PresenterMainActivity {
         return inputMat;
     }
 
-    private Mat DetectRegionOfImage(Mat mapStrenght, Mat markerWaterShed){
+    private Mat DetectRegionOfImage(Mat inputMat, Mat mapStrenght, Mat markerWaterShed){
         Mat result = new Mat();
+//        for(int r = 0; r < inputMat.rows(); r++){
+//            for(int c = 0; c < inputMat.cols(); c++){
+//                if(markerWaterShed.get(r,c)[0] == -1)
+//                    Log.d("anbt","value marker: " + markerWaterShed.get(r,c)[0] );
+//            }
+//        }
         result = markerWaterShed;
+//        Core.convertScaleAbs(markerWaterShed,result);
         return result;
     }
 
