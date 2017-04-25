@@ -35,7 +35,6 @@ import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
 
 import static org.opencv.core.Core.BORDER_DEFAULT;
 import static org.opencv.core.CvType.CV_32F;
-import static org.opencv.core.CvType.CV_8U;
 import static org.opencv.core.Mat.zeros;
 
 /**
@@ -385,17 +384,6 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, deNoisingImage1);
 //        ShowImage(processedImageView2, deNoisingImage2);
 
-        //Apply watershed to detect region
-
-        //Best apply WaterShed
-        Mat appliedWaterShed1 = new Mat();
-        Mat appliedWaterShed2 = new Mat();
-        appliedWaterShed1 = steptowatershed(inputMat1);
-        appliedWaterShed2 = steptowatershed(inputMat2);
-        ShowImage(processedImageView1, appliedWaterShed1);
-        ShowImage(processedImageView2, appliedWaterShed2);
-
-
         //Gradient 2nd
 //        Mat processedMat1_gradient2 = new Mat();
 //        Mat processedMat2_gradient2 = new Mat();
@@ -404,14 +392,34 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, processedMat1_gradient2);
 //        ShowImage(processedImageView2, processedMat2_gradient2);
 
+        //Apply watershed to detect region
+        //Best apply WaterShed
+        Mat appliedWaterShed1 = new Mat();
+        Mat appliedWaterShed2 = new Mat();
+        appliedWaterShed1 = StepToWaterShed(inputMat1);
+        appliedWaterShed2 = StepToWaterShed(inputMat2);
+//        ShowImage(processedImageView1, appliedWaterShed1);
+//        ShowImage(processedImageView2, appliedWaterShed2);
 
         //Map Gradient 1st
-//        Mat processMat1_edgeStrenght = new Mat();
-//        Mat processMat2_edgeStrenght = new Mat();
-//        processMat1_edgeStrenght = CalculateMapStrength(inputMat1);
-//        processMat2_edgeStrenght = CalculateMapStrength(inputMat2);
+        Mat processMat1_edgeStrenght = new Mat();
+        Mat processMat2_edgeStrenght = new Mat();
+        processMat1_edgeStrenght = CalculateMapStrength(inputMat1);
+        processMat1_edgeStrenght = FilterMapStrength(processMat1_edgeStrenght);
+        processMat2_edgeStrenght = CalculateMapStrength(inputMat2);
+        processMat2_edgeStrenght = FilterMapStrength(processMat2_edgeStrenght);
 //        ShowImage(processedImageView1, processMat1_edgeStrenght);
 //        ShowImage(processedImageView2, processMat2_edgeStrenght);
+
+        //Compile watershed result and map gradient result
+        Mat regionsOfImage1 = new Mat();
+        Mat regionsOfImage2 = new Mat();
+        regionsOfImage1 = DetectRegionOfImage(processMat1_edgeStrenght,appliedWaterShed1);
+        regionsOfImage2 = DetectRegionOfImage(processMat2_edgeStrenght, appliedWaterShed2);
+        ShowImage(processedImageView1,regionsOfImage1);
+        ShowImage(processedImageView2,regionsOfImage2);
+
+
     }
 
     public void Progress2017FebWeek4(){
@@ -653,30 +661,28 @@ public class PresenterMainActivity {
         return inputMat;
     }
 
-    public Mat steptowatershed(Mat img)
+    public Mat StepToWaterShed(Mat img)
     {
         Mat threeChannel = new Mat();
-
         Imgproc.cvtColor(img, threeChannel, Imgproc.COLOR_BGR2GRAY);
         Imgproc.threshold(threeChannel, threeChannel, 100, 255, Imgproc.THRESH_BINARY);
-//        Imgproc.threshold(threeChannel, threeChannel, 80, 180, Imgproc.THRESH_BINARY);
-
         Mat fg = new Mat(img.size(),CvType.CV_8U);
-        Imgproc.erode(threeChannel,fg,new Mat());
-
+        int erosion_size = 3;
+        Mat elementEroding = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*erosion_size + 1, 2*erosion_size+1));
+        Imgproc.erode(threeChannel,fg,elementEroding);
         Mat bg = new Mat(img.size(),CvType.CV_8U);
-        Imgproc.dilate(threeChannel,bg,new Mat());
-        Imgproc.threshold(bg,bg,1, 128,Imgproc.THRESH_BINARY_INV);
-//        Imgproc.threshold(bg,bg, 1, 90,Imgproc.THRESH_BINARY_INV);
-
+        int dilation_size = 3;
+        Mat elementDilating = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*dilation_size + 1, 2*dilation_size+1));
+        Imgproc.dilate(threeChannel,bg,elementDilating);
+        Imgproc.threshold(bg,bg, 1, 128,Imgproc.THRESH_BINARY_INV);
         Mat markers = new Mat(img.size(),CvType.CV_8U, new Scalar(0));
         Core.add(fg, bg, markers);
-        Mat result1=new Mat();
+
         WatershedSegmenter segmenter = new WatershedSegmenter();
         segmenter.setMarkers(markers);
-
+//
         Imgproc.cvtColor(img, img, Imgproc.COLOR_RGBA2RGB);
-        result1 = segmenter.process(img);
+        Mat result1 = segmenter.process(img);
         return result1;
     }
 
@@ -686,7 +692,6 @@ public class PresenterMainActivity {
 
         public void setMarkers(Mat markerImage)
         {
-
             markerImage.convertTo(markers, CvType.CV_32SC1);
         }
 
@@ -739,5 +744,18 @@ public class PresenterMainActivity {
 //        Core.magnitude(dx, dy, outputMat);
         return outputMat;
     }
+
+    private Mat FilterMapStrength(Mat inputMat)
+    {
+        Imgproc.threshold(inputMat,inputMat,42,255,Imgproc.THRESH_BINARY);
+        return inputMat;
+    }
+
+    private Mat DetectRegionOfImage(Mat mapStrenght, Mat markerWaterShed){
+        Mat result = new Mat();
+        result = markerWaterShed;
+        return result;
+    }
+
 
 }
