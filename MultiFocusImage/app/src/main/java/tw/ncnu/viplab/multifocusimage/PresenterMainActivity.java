@@ -254,12 +254,11 @@ public class PresenterMainActivity {
        //Image Segmentation
 
 
-        //Edge dectector
         //Edge detection
-//        Mat processedMat1_detectedEdges = new Mat();
-//        Mat processedMat2_detectedEdges = new Mat();
-//        processedMat1_detectedEdges = EdgeDetector(inputMat1);
-//        processedMat2_detectedEdges = EdgeDetector(inputMat2);
+        Mat processedMat1_detectedEdges = new Mat();
+        Mat processedMat2_detectedEdges = new Mat();
+        processedMat1_detectedEdges = EdgeDetector(inputMat1);
+        processedMat2_detectedEdges = EdgeDetector(inputMat2);
 //        ShowImage(processedImageView1, processedMat1_detectedEdges);
 //        ShowImage(processedImageView2, processedMat2_detectedEdges);
 
@@ -368,13 +367,12 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView2, mat2DetectByColor);
 
         //Get Heat Map
-//        Mat heatMap1 = new Mat();
-//        Mat heatMap2 = new Mat();
-//        heatMap1 = GetHeatMap(inputMat1);
-//        heatMap2 = GetHeatMap(inputMat2);
+        Mat colorMap1 = new Mat();
+        Mat colorMap2 = new Mat();
+        colorMap1 = GetColorMap(inputMat1);
+        colorMap2 = GetColorMap(inputMat2);
 //        ShowImage(processedImageView1,heatMap1);
 //        ShowImage(processedImageView2, heatMap2);
-
 
         //De Noising
 //        Mat deNoisingImage1 = new Mat();
@@ -411,15 +409,17 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, processMat1_edgeStrenght);
 //        ShowImage(processedImageView2, processMat2_edgeStrenght);
 
-        //Compile watershed result and map gradient result
+        //Compile watershed result and map gradient result and ColorMap
         Mat regionsOfImage1 = new Mat();
         Mat regionsOfImage2 = new Mat();
-        regionsOfImage1 = DetectRegionOfImage(inputMat1, processMat1_edgeStrenght,appliedWaterShed1);
-        regionsOfImage2 = DetectRegionOfImage(inputMat2, processMat2_edgeStrenght, appliedWaterShed2);
+        regionsOfImage1 = DetectRegionOfImage(inputMat1, processMat1_edgeStrenght,appliedWaterShed1, colorMap1);
+        regionsOfImage2 = DetectRegionOfImage(inputMat2, processMat2_edgeStrenght, appliedWaterShed2, colorMap2);
         ShowImage(processedImageView1,regionsOfImage1);
         ShowImage(processedImageView2,regionsOfImage2);
 
-
+//        Mat drawContoursMat1 = new Mat();
+//        drawContoursMat1 = DrawContours(inputMat1,processMat1_edgeStrenght);
+//        ShowImage(processedImageView1, drawContoursMat1);
     }
 
     public void Progress2017FebWeek4(){
@@ -648,11 +648,12 @@ public class PresenterMainActivity {
 //        Core.inRange(input, new Scalar(160, 100, 100), new Scalar(179, 255, 255), upper_red_hue_range);
         return lower_red_hue_range;
     }
-    private Mat GetHeatMap(Mat inputMat)
+    private Mat GetColorMap(Mat inputMat)
     {
-        Imgproc.cvtColor(inputMat, inputMat, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.applyColorMap(inputMat, inputMat, Imgproc.COLORMAP_JET);
-        return inputMat;
+        Mat resultMat = inputMat.clone();
+        Imgproc.cvtColor(inputMat, resultMat, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.applyColorMap(resultMat, resultMat, Imgproc.COLORMAP_JET);
+        return resultMat;
     }
 
     private Mat DeNoisingImage(Mat inputMat){
@@ -665,13 +666,13 @@ public class PresenterMainActivity {
     {
         Mat threeChannel = new Mat();
         Imgproc.cvtColor(img, threeChannel, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.threshold(threeChannel, threeChannel, 42, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(threeChannel, threeChannel, 105, 255, Imgproc.THRESH_BINARY);
         Mat fg = new Mat(img.size(),CvType.CV_8U);
-        int erosion_size = 3;
+        int erosion_size = 6;
         Mat elementEroding = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*erosion_size + 1, 2*erosion_size+1));
         Imgproc.erode(threeChannel,fg,elementEroding);
         Mat bg = new Mat(img.size(),CvType.CV_8U);
-        int dilation_size = 3;
+        int dilation_size = 6;
         Mat elementDilating = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*dilation_size + 1, 2*dilation_size+1));
         Imgproc.dilate(threeChannel,bg,elementDilating);
         Imgproc.threshold(bg,bg, 1, 128,Imgproc.THRESH_BINARY_INV);
@@ -705,16 +706,17 @@ public class PresenterMainActivity {
     }
 
     private Mat EdgeDetector(Mat inputMat){
-        Imgproc.cvtColor(inputMat, inputMat, Imgproc.COLOR_RGBA2GRAY);
-        Imgproc.blur(inputMat,inputMat, new Size(3,3));
+        Mat output = new Mat();
+        Imgproc.cvtColor(inputMat, output, Imgproc.COLOR_RGBA2GRAY);
+        Imgproc.blur(output,output, new Size(3,3));
         double threshold = 10;
         //Gradient 1st
-        Imgproc.Canny(inputMat,inputMat,threshold,threshold*3,3,false);
+        Imgproc.Canny(output,output,threshold,threshold*3,3,false);
 
 //        //Gradient 2nd
 //        Imgproc.blur(inputMat, inputMat, new Size(5,5));
 //        Imgproc.Canny(inputMat, inputMat, threshold, threshold*3,5,true);
-        return inputMat;
+        return output;
     }
 
     private Mat Gradient2nd(Mat inputMat){
@@ -729,40 +731,68 @@ public class PresenterMainActivity {
     }
 
     private Mat CalculateMapStrength(Mat inputMat){
+        Mat outputMat = new Mat();
         //Convert to grayscale
-        Imgproc.cvtColor(inputMat,inputMat, Imgproc.COLOR_RGBA2GRAY);
+        Imgproc.cvtColor(inputMat,outputMat, Imgproc.COLOR_RGBA2GRAY);
         //Compute dx and dy derivatives
         Mat dx = new Mat();
         Mat dy = new Mat();
-        Imgproc.Sobel(inputMat, dx, CV_32F, 1, 0);
-        Imgproc.Sobel(inputMat, dy, CV_32F, 0, 1);
+        Imgproc.Sobel(outputMat, dx, CV_32F, 1, 0);
+        Imgproc.Sobel(outputMat, dy, CV_32F, 0, 1);
         Core.convertScaleAbs(dx,dx);
         Core.convertScaleAbs(dy,dy);
         //Compute gradient
 //        Core.magnitude(dx, dy, inputMat);
-        Mat outputMat = new Mat();
-        Core.addWeighted(dx,0.5,dy,0.5,0,outputMat);
+        Mat resultMat = new Mat();
+        Core.addWeighted(dx,0.5,dy,0.5,0,resultMat);
 //        Core.magnitude(dx, dy, outputMat);
-        return outputMat;
+        return resultMat;
     }
 
     private Mat FilterMapStrength(Mat inputMat)
     {
-        Imgproc.threshold(inputMat,inputMat,42,255,Imgproc.THRESH_BINARY);
-        return inputMat;
+        Mat resultMat = new Mat();
+        Imgproc.threshold(inputMat,resultMat,42,255,Imgproc.THRESH_BINARY);
+        return resultMat;
     }
 
-    private Mat DetectRegionOfImage(Mat inputMat, Mat mapStrenght, Mat markerWaterShed){
-        Mat result = new Mat();
+    private Mat DetectRegionOfImage(Mat inputMat, Mat mapStrenght, Mat markerWaterShed, Mat colorMap){
+        Mat result = inputMat.clone();
 //        for(int r = 0; r < inputMat.rows(); r++){
 //            for(int c = 0; c < inputMat.cols(); c++){
 //                if(markerWaterShed.get(r,c)[0] == -1)
 //                    Log.d("anbt","value marker: " + markerWaterShed.get(r,c)[0] );
 //            }
 //        }
-        result = markerWaterShed;
-//        Core.convertScaleAbs(markerWaterShed,result);
+//
+////        for(int r = 0; r < inputMat.rows(); r++) {
+////            for (int c = 0; c < inputMat.cols(); c++) {
+////                if(mapStrenght.get(r,c)[0] == 255){
+////                    result.put(r,c,colorMap.get(r,c));
+////
+////                }
+////                else{
+////                    result.put(r,c,0);
+////                }
+////            }
+////        }
+//        result = markerWaterShed;
+        Core.convertScaleAbs(markerWaterShed,result);
+
+//        result = StepToWaterShed(mapStrenght);
         return result;
+    }
+    private Mat DrawContours(Mat inputMat, Mat cannyDetected){
+        Mat output = inputMat;
+
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        Mat hierarchy = new Mat();
+        // find contours:
+        Imgproc.findContours(cannyDetected, contours, hierarchy, Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+        for (int contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
+            Imgproc.drawContours(output, contours, contourIdx, new Scalar(0, 0, 255), -1);
+        }
+        return output;
     }
 
 
