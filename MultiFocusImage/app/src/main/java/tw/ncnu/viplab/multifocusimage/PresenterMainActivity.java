@@ -29,6 +29,7 @@ import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
@@ -412,8 +413,8 @@ public class PresenterMainActivity {
         //Compile watershed result and map gradient result and ColorMap
         Mat regionsOfImage1 = new Mat();
         Mat regionsOfImage2 = new Mat();
-        regionsOfImage1 = DetectRegionOfImage(inputMat1, processMat1_edgeStrenght,appliedWaterShed1, colorMap1);
-        regionsOfImage2 = DetectRegionOfImage(inputMat2, processMat2_edgeStrenght, appliedWaterShed2, colorMap2);
+        regionsOfImage1 = DetectRegionOfImage(inputMat1, processMat1_edgeStrenght,appliedWaterShed1, colorMap1, processedMat1_detectedEdges);
+        regionsOfImage2 = DetectRegionOfImage(inputMat2, processMat2_edgeStrenght, appliedWaterShed2, colorMap2, processedMat2_detectedEdges);
         ShowImage(processedImageView1,regionsOfImage1);
         ShowImage(processedImageView2,regionsOfImage2);
 
@@ -709,10 +710,10 @@ public class PresenterMainActivity {
         Mat output = new Mat();
         Imgproc.cvtColor(inputMat, output, Imgproc.COLOR_RGBA2GRAY);
         Imgproc.blur(output,output, new Size(3,3));
-        double threshold = 10;
+        double threshold = 40;
         //Gradient 1st
         Imgproc.Canny(output,output,threshold,threshold*3,3,false);
-
+//        Imgproc.Canny(output,output,42,255);
 //        //Gradient 2nd
 //        Imgproc.blur(inputMat, inputMat, new Size(5,5));
 //        Imgproc.Canny(inputMat, inputMat, threshold, threshold*3,5,true);
@@ -756,8 +757,8 @@ public class PresenterMainActivity {
         return resultMat;
     }
 
-    private Mat DetectRegionOfImage(Mat inputMat, Mat mapStrenght, Mat markerWaterShed, Mat colorMap){
-        Mat result = inputMat.clone();
+    private Mat DetectRegionOfImage(Mat inputMat, Mat mapStrenght, Mat markerWaterShed, Mat colorMap, Mat cannyDetected){
+        Mat result = mapStrenght;
 //        for(int r = 0; r < inputMat.rows(); r++){
 //            for(int c = 0; c < inputMat.cols(); c++){
 //                if(markerWaterShed.get(r,c)[0] == -1)
@@ -777,13 +778,31 @@ public class PresenterMainActivity {
 ////            }
 ////        }
 //        result = markerWaterShed;
-        Core.convertScaleAbs(markerWaterShed,result);
+//        Core.convertScaleAbs(markerWaterShed,result);
 
 //        result = StepToWaterShed(mapStrenght);
+//        Imgproc.Canny(markerWaterShed,result,45,150,3,false);
+//        result = cannyDetected;
         return result;
+//        //Draw
+//
+//        Mat drawing = zeros(inputMat.rows(),inputMat.cols(),CvType.CV_8UC3);
+//        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+//        Mat hierarchy = new Mat();
+//        // find contours:
+//        Imgproc.findContours(cannyDetected, contours, hierarchy, Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+//        Log.d("anbt","contours size: " + contours.size());
+//        for (int contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
+//            Scalar color = new Scalar(new Random().nextInt(255),new Random().nextInt(255), new Random().nextInt(255) );
+//            Imgproc.drawContours(drawing, contours, contourIdx, color, 5);
+////            Imgproc.rectangle()
+////            Imgproc.rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
+//        }
+//        return drawing;
+
     }
     private Mat DrawContours(Mat inputMat, Mat cannyDetected){
-        Mat output = inputMat;
+        Mat output = inputMat.clone();
 
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Mat hierarchy = new Mat();
