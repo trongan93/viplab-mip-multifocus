@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import org.opencv.calib3d.StereoBM;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.KeyPoint;
@@ -33,6 +34,7 @@ import java.util.Random;
 
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
+import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageSegmentation;
 
 import static org.opencv.core.Core.BORDER_DEFAULT;
 import static org.opencv.core.CvType.CV_32F;
@@ -208,7 +210,7 @@ public class PresenterMainActivity {
         return result;
     }
 
-    public void Progress2017JanWeek3(){
+    public void MainProcess(){
         FeatureDetector detector = FeatureDetector.create(FeatureDetector.ORB);
         MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
         MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
@@ -415,14 +417,30 @@ public class PresenterMainActivity {
         Mat regionsOfImage2 = new Mat();
         regionsOfImage1 = DetectRegionOfImage(inputMat1, processMat1_edgeStrenght,appliedWaterShed1, colorMap1, processedMat1_detectedEdges);
         regionsOfImage2 = DetectRegionOfImage(inputMat2, processMat2_edgeStrenght, appliedWaterShed2, colorMap2, processedMat2_detectedEdges);
-        ShowImage(processedImageView1,regionsOfImage1);
-        ShowImage(processedImageView2,regionsOfImage2);
+//        ShowImage(processedImageView1,regionsOfImage1);
+//        ShowImage(processedImageView2,regionsOfImage2);
+
+
 
 //        Mat drawContoursMat1 = new Mat();
 //        drawContoursMat1 = DrawContours(inputMat1,processMat1_edgeStrenght);
 //        ShowImage(processedImageView1, drawContoursMat1);
-    }
 
+
+        /**June 24 2017
+         * Last Modifed: June 27 2017
+         * Image Segmentaion
+         */
+        Mat imageSegmentation1 = new Mat();
+        Mat imageSegmentation2 = new Mat();
+        ImageSegmentation ImageSegmetation1 = new ImageSegmentation(inputMat1, processedMat1_detectedEdges, appliedWaterShed1);
+        ImageSegmentation ImageSegmetation2 = new ImageSegmentation(inputMat1, processMat2_edgeStrenght, appliedWaterShed2);
+        imageSegmentation1 = ImageSegmetation1.GetResult();
+        imageSegmentation2 = ImageSegmetation2.GetResult();
+        ShowImage(processedImageView1, imageSegmentation1);
+        ShowImage(processedImageView2, imageSegmentation2);
+
+    }
     public void Progress2017FebWeek4(){
         //onTouchImageView(processedImageView1,processedImageView2);
     }
@@ -456,7 +474,6 @@ public class PresenterMainActivity {
             }
         });
     }
-
     private double calculatorSF(Mat inputImage){
         double SF = 0;
         int rows = inputImage.rows();
@@ -482,7 +499,6 @@ public class PresenterMainActivity {
         SF = Math.sqrt(squareRowFrequency + squareColFrequency);
         return SF;
     }
-
     private void printMatBinaryObject(Mat inputBinaryMat){
         String result = "";
         for(int row = 0; row < inputBinaryMat.rows(); row++){
@@ -509,7 +525,6 @@ public class PresenterMainActivity {
             }
         }
     }
-
     private static Mat minimusOfMat(Mat inputMatA, Mat inputMatB){
         Mat result = new Mat(inputMatA.size(),CvType.CV_8U);
         for(int row = 0; row < result.rows(); row++){
@@ -527,13 +542,11 @@ public class PresenterMainActivity {
         }
         return result;
     }
-
     private static Mat drawObjectWithKeypoints(MatOfKeyPoint keyPoints){
         Mat result = new Mat();
 
         return result;
     }
-
     public void applyDetection(Mat src, Mat dst) {
         if (dst != src) {
             src.copyTo(dst);
@@ -578,7 +591,6 @@ public class PresenterMainActivity {
             }
 
     }
-
     public void DrawingKeyPointFeatureTheSameRGB(Mat matInput, MatOfKeyPoint matOfKeyPoint){
        //Draw match all keypoint
         KeyPoint[] keyPoints = matOfKeyPoint.toArray();
@@ -614,8 +626,6 @@ public class PresenterMainActivity {
 //            }
 //        }
     }
-
-
     private Mat MappingListPointsToMat(MatOfKeyPoint matOfKeyPoint){
         KeyPoint[] keyPoints = matOfKeyPoint.toArray();
         List<Point> points = new ArrayList<>();
@@ -637,7 +647,6 @@ public class PresenterMainActivity {
         return outputMat;
 //        http://stackoverflow.com/questions/10137249/android-opencv-listkeypoint-to-mat
     }
-
     private Mat DetectObjectByColor(Mat input, Scalar scalar){
         Imgproc.cvtColor(input,input,Imgproc.COLOR_RGBA2RGB);
         Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2HSV);
@@ -649,24 +658,20 @@ public class PresenterMainActivity {
 //        Core.inRange(input, new Scalar(160, 100, 100), new Scalar(179, 255, 255), upper_red_hue_range);
         return lower_red_hue_range;
     }
-    private Mat GetColorMap(Mat inputMat)
-    {
+    private Mat GetColorMap(Mat inputMat) {
         Mat resultMat = inputMat.clone();
         Imgproc.cvtColor(inputMat, resultMat, Imgproc.COLOR_BGR2GRAY);
         Imgproc.applyColorMap(resultMat, resultMat, Imgproc.COLORMAP_JET);
         return resultMat;
     }
-
     private Mat DeNoisingImage(Mat inputMat){
         Imgproc.cvtColor(inputMat,inputMat, Imgproc.COLOR_RGBA2GRAY);
         Photo.fastNlMeansDenoising(inputMat, inputMat);
         return inputMat;
     }
-
-    public Mat StepToWaterShed(Mat img)
-    {
+    public Mat StepToWaterShed(Mat img) {
         Mat threeChannel = new Mat();
-        Imgproc.cvtColor(img, threeChannel, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.cvtColor(img, threeChannel, Imgproc.COLOR_BGRA2GRAY);
         Imgproc.threshold(threeChannel, threeChannel, 105, 255, Imgproc.THRESH_BINARY);
         Mat fg = new Mat(img.size(),CvType.CV_8U);
         int erosion_size = 6;
@@ -683,13 +688,11 @@ public class PresenterMainActivity {
         WatershedSegmenter segmenter = new WatershedSegmenter();
         segmenter.setMarkers(markers);
 //
-        Imgproc.cvtColor(img, img, Imgproc.COLOR_RGBA2RGB);
+        Imgproc.cvtColor(img, img, Imgproc.COLOR_RGBA2BGR);
         Mat result1 = segmenter.process(img);
         return result1;
     }
-
-    public class WatershedSegmenter
-    {
+    public class WatershedSegmenter {
         public Mat markers=new Mat();
 
         public void setMarkers(Mat markerImage)
@@ -705,21 +708,19 @@ public class PresenterMainActivity {
         }
 
     }
-
     private Mat EdgeDetector(Mat inputMat){
         Mat output = new Mat();
         Imgproc.cvtColor(inputMat, output, Imgproc.COLOR_RGBA2GRAY);
         Imgproc.blur(output,output, new Size(3,3));
         double threshold = 40;
         //Gradient 1st
-        Imgproc.Canny(output,output,threshold,threshold*3,3,false);
+        Imgproc.Canny(output,output,threshold,50,3,false);//Old version 40 and 120; modified in June 27
 //        Imgproc.Canny(output,output,42,255);
 //        //Gradient 2nd
 //        Imgproc.blur(inputMat, inputMat, new Size(5,5));
 //        Imgproc.Canny(inputMat, inputMat, threshold, threshold*3,5,true);
         return output;
     }
-
     private Mat Gradient2nd(Mat inputMat){
 //        Imgproc.Sobel(inputMat, inputMat, CvType.CV_8U, 1, 0, 5, 2, 0, BORDER_DEFAULT); //gradient X: dx = 1, dy = 0; gradient Y: dx = 0, dy = 1
         int scale = 1;
@@ -730,7 +731,6 @@ public class PresenterMainActivity {
         Imgproc.Sobel(inputMat, inputMat, ddepth,0,1,maskSize,scale,delta);
         return inputMat;
     }
-
     private Mat CalculateMapStrength(Mat inputMat){
         Mat outputMat = new Mat();
         //Convert to grayscale
@@ -749,14 +749,11 @@ public class PresenterMainActivity {
 //        Core.magnitude(dx, dy, outputMat);
         return resultMat;
     }
-
-    private Mat FilterMapStrength(Mat inputMat)
-    {
+    private Mat FilterMapStrength(Mat inputMat){
         Mat resultMat = new Mat();
         Imgproc.threshold(inputMat,resultMat,42,255,Imgproc.THRESH_BINARY);
         return resultMat;
     }
-
     private Mat DetectRegionOfImage(Mat inputMat, Mat mapStrenght, Mat markerWaterShed, Mat colorMap, Mat cannyDetected){
         Mat result = mapStrenght;
 //        for(int r = 0; r < inputMat.rows(); r++){
@@ -813,6 +810,5 @@ public class PresenterMainActivity {
         }
         return output;
     }
-
 
 }
