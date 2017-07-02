@@ -714,7 +714,7 @@ public class PresenterMainActivity {
         Imgproc.blur(output,output, new Size(3,3));
         double threshold = 40;
         //Gradient 1st
-        Imgproc.Canny(output,output,threshold,50,3,false);//Old version 40 and 120; modified in June 27
+        Imgproc.Canny(output,output,40,120,3,false);//Old version 40 and 120; modified in June 27
 //        Imgproc.Canny(output,output,42,255);
 //        //Gradient 2nd
 //        Imgproc.blur(inputMat, inputMat, new Size(5,5));

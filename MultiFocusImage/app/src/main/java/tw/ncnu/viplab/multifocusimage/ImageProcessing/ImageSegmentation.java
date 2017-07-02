@@ -5,6 +5,7 @@ import android.widget.ImageView;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
@@ -76,6 +77,22 @@ public class ImageSegmentation {
          * Step 1: Define Contours
          * Reference: http://answers.opencv.org/question/43700/android-using-drawcontours-to-fill-region/
          */
+        //OPTION 1
+//        //dilating Canny edges
+//        int dilation_size = 6;
+//        Mat elementDilating = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*dilation_size + 1, 2*dilation_size+1));
+//        Imgproc.dilate(cannyEdgeMat,cannyEdgeMat,elementDilating);
+//
+//        //Encrosing Canny Edges
+//        int erosion_size = 6;
+//        Mat elementEroding = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2*erosion_size + 1, 2*erosion_size+1));
+//        Imgproc.erode(cannyEdgeMat,cannyEdgeMat,elementEroding);
+
+        //OPTION 2
+        Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(55, 55));
+        Imgproc.morphologyEx(cannyEdgeMat, cannyEdgeMat, Imgproc.MORPH_CLOSE, structuringElement );
+        outputMat = cannyEdgeMat;
+
         //Using result of Canny Edge
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierachy = new Mat();
