@@ -1,7 +1,5 @@
 package tw.ncnu.viplab.multifocusimage.ImageProcessing;
 
-import android.widget.ImageView;
-
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
@@ -23,11 +21,6 @@ public class ImageSegmentation {
     private Mat cannyEdgeMat;
     private Mat waterShedResultMat;
     private Mat outputMat;
-    public ImageSegmentation(Mat inputMat) {
-        this.inputMat = inputMat;
-        this.outputMat = new Mat(inputMat.size(), inputMat.type());
-        ChangeBackgroud();
-    }
 
     public ImageSegmentation(Mat inputMat, Mat cannyEdgeMat, Mat waterShedResultMat) {
         this.inputMat = inputMat;
@@ -36,11 +29,14 @@ public class ImageSegmentation {
         this.outputMat = new Mat(inputMat.size(), inputMat.type());
         /**
          * Idead combine WaterShed and Contours
-         * Step 1: Define Contours
-         * Step 2: Recevice WaterShed from Pesenter
-         * Step 3: Combine 2 results
+         * Step 1: Connect edge detected
+         * Step 2: Define Contours
+         * Step 3: Process for 2 image
+         *      Step 3.1: Near focus image: Define region and draw near with black color and far with white color
+         *      Step 3.2: Far focus image: Define region and draw near with black color and far with white color
+         * Step 4: Combine 2 region from 3.1 and 3.2
          */
-        CombineWaterShedAndContours();
+        ContourProcessWithEdgesResult();
     }
 
     public Mat GetResult()
@@ -48,27 +44,8 @@ public class ImageSegmentation {
         return this.outputMat;
     }
 
-    //! [black_bg]
-    // Change the background from white to black, since that will help later to extract
-    // better results during the use of Distance Transform
-    private void ChangeBackgroud()
-    {
-        for( int x = 0; x < inputMat.rows(); x++ ) {
-            for( int y = 0; y < inputMat.cols(); y++ ) {
-//                if ( inputMat.at<Vec3b>(x, y) == Vec3b(255,255,255) ) {
-//                    src.at<Vec3b>(x, y)[0] = 0;
-//                    src.at<Vec3b>(x, y)[1] = 0;
-//                    src.at<Vec3b>(x, y)[2] = 0;
-//                }
-                if(inputMat.get(x,y).equals(new double[]{255,255,255})){
-                    inputMat.put(x,y,new double[]{0,0,0});
-                }
 
-            }
-        }
-    }
-
-    private void CombineWaterShedAndContours(){
+    private void ContourProcessWithEdgesResult(){
 //        Mat inputConverted = inputMat.clone();
 //        Imgproc.cvtColor(inputConverted, inputConverted, Imgproc.COLOR_BGR2GRAY);
 //        Mat threshold = new Mat();
@@ -89,9 +66,9 @@ public class ImageSegmentation {
 //        Imgproc.erode(cannyEdgeMat,cannyEdgeMat,elementEroding);
 
         //OPTION 2
-        Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(55, 55));
+        Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(40, 40));//source_1 use 55,55
         Imgproc.morphologyEx(cannyEdgeMat, cannyEdgeMat, Imgproc.MORPH_CLOSE, structuringElement );
-        outputMat = cannyEdgeMat;
+//        outputMat = cannyEdgeMat;
 
         //Using result of Canny Edge
         List<MatOfPoint> contours = new ArrayList<>();
