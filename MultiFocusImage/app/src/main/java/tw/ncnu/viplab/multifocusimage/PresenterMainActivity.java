@@ -34,6 +34,7 @@ import java.util.Random;
 
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
+import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageCombine2Regions;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageSegmentation;
 
 import static org.opencv.core.Core.BORDER_DEFAULT;
@@ -437,8 +438,19 @@ public class PresenterMainActivity {
         ImageSegmentation ImageSegmetation2 = new ImageSegmentation(inputMat1, processMat2_edgeStrenght, appliedWaterShed2);
         imageSegmentation1 = ImageSegmetation1.GetResult();
         imageSegmentation2 = ImageSegmetation2.GetResult();
-        ShowImage(processedImageView1, imageSegmentation1);
-        ShowImage(processedImageView2, imageSegmentation2);
+
+
+//        ShowImage(processedImageView1, imageSegmentation1);
+//        ShowImage(processedImageView2, imageSegmentation2);
+
+        /**
+         * July 4th 2017
+         */
+        ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
+        Combine2Image.PreProcessNearRegion();
+        Combine2Image.PreProcessFarRegion();
+        ShowImage(processedImageView1, Combine2Image.matNearRegionProcessing);
+        ShowImage(processedImageView2, Combine2Image.matFarRegionProcessing);
 
     }
     public void Progress2017FebWeek4(){
