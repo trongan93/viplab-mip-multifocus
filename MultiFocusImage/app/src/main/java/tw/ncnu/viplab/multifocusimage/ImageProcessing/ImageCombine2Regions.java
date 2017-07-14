@@ -18,8 +18,10 @@ public class ImageCombine2Regions {
     Mat matNearRegionWithContour;
     Mat matFarRegionWithContour;
 
+
     public Mat matNearRegionProcessing;
     public Mat matFarRegionProcessing;
+    public Mat matResultAfterCombine;
     double[] white_value = {255.0,255.0,255.0};
     double[] black_value = {0.0, 0.0, 0.0};
 
@@ -28,12 +30,18 @@ public class ImageCombine2Regions {
         this.matFarRegionWithContour = matFarRegionWithContour;
         matNearRegionProcessing = new Mat(matNearRegionWithContour.size(), matNearRegionWithContour.type());
         matFarRegionProcessing = new Mat(matFarRegionWithContour.size(), matFarRegionWithContour.type());
+        matResultAfterCombine = new Mat(matNearRegionWithContour.size(), matNearRegionWithContour.type());
+
+        //Process Image
+        PreProcessNearRegion();
+        PreProcessFarRegion();
+        Combine2PreProcessing();
     }
 
     /*
         Pre process near region
      */
-    public void PreProcessNearRegion() {
+    private void PreProcessNearRegion() {
         if (null != matNearRegionWithContour) {
             for (int r = 0; r < matNearRegionWithContour.rows(); r++) {
                 for (int c = 0; c < matNearRegionWithContour.cols(); c++) {
@@ -51,7 +59,7 @@ public class ImageCombine2Regions {
     /*
         Pre process far region
      */
-    public void PreProcessFarRegion(){
+    private void PreProcessFarRegion(){
         if(null != matFarRegionWithContour){
             for(int r = 0; r < matFarRegionWithContour.rows(); r++){
                 for(int c = 0; c < matFarRegionWithContour.cols(); c++){
@@ -62,6 +70,25 @@ public class ImageCombine2Regions {
                     else{
                         matFarRegionProcessing.put(r,c,white_value);
                     }
+                }
+            }
+        }
+    }
+    /*Combine 2 Pre Processing*/
+    private void Combine2PreProcessing(){
+        for(int r = 0; r < matNearRegionProcessing.rows(); r++){
+            for(int c = 0; c < matNearRegionProcessing.cols(); c++){
+                double[] nearRegionPixelValues = matNearRegionProcessing.get(r,c);
+                double[] farRegionPixelValues = matFarRegionProcessing.get(r,c);
+                if(nearRegionPixelValues[0] == 0 && nearRegionPixelValues[1] == 0 && nearRegionPixelValues[2] == 0){
+                    matResultAfterCombine.put(r,c,black_value);
+                }
+                else if(farRegionPixelValues[0] == 0 && farRegionPixelValues[1] == 0 && farRegionPixelValues[2] == 0){
+                    matResultAfterCombine.put(r,c,black_value);
+                }
+                else
+                {
+                    matResultAfterCombine.put(r,c,white_value);
                 }
             }
         }

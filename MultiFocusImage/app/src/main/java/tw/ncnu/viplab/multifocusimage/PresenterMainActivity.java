@@ -447,10 +447,10 @@ public class PresenterMainActivity {
          * July 4th 2017
          */
         ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
-        Combine2Image.PreProcessNearRegion();
-        Combine2Image.PreProcessFarRegion();
-        ShowImage(processedImageView1, Combine2Image.matNearRegionProcessing);
-        ShowImage(processedImageView2, Combine2Image.matFarRegionProcessing);
+
+
+        ShowImage(processedImageView1, Combine2Image.matResultAfterCombine);
+        ShowImage(processedImageView2, Combine2Image.matResultAfterCombine);
 
     }
     public void Progress2017FebWeek4(){
