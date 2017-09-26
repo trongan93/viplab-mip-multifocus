@@ -1,12 +1,6 @@
 package tw.ncnu.viplab.multifocusimage.ImageProcessing;
 
-import android.graphics.Color;
-import android.util.Log;
-
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 
 /**
  * Created by Bui Trong An on 7/4/2017.
@@ -21,7 +15,7 @@ public class ImageCombine2Regions {
 
     public Mat matNearRegionProcessing;
     public Mat matFarRegionProcessing;
-    public Mat matResultAfterCombine;
+    public Mat matResultAfterPreCombine;
     double[] white_value = {255.0,255.0,255.0};
     double[] black_value = {0.0, 0.0, 0.0};
 
@@ -30,7 +24,7 @@ public class ImageCombine2Regions {
         this.matFarRegionWithContour = matFarRegionWithContour;
         matNearRegionProcessing = new Mat(matNearRegionWithContour.size(), matNearRegionWithContour.type());
         matFarRegionProcessing = new Mat(matFarRegionWithContour.size(), matFarRegionWithContour.type());
-        matResultAfterCombine = new Mat(matNearRegionWithContour.size(), matNearRegionWithContour.type());
+        matResultAfterPreCombine = new Mat(matNearRegionWithContour.size(), matNearRegionWithContour.type());
 
         //Process Image
         PreProcessNearRegion();
@@ -81,16 +75,33 @@ public class ImageCombine2Regions {
                 double[] nearRegionPixelValues = matNearRegionProcessing.get(r,c);
                 double[] farRegionPixelValues = matFarRegionProcessing.get(r,c);
                 if(nearRegionPixelValues[0] == 0 && nearRegionPixelValues[1] == 0 && nearRegionPixelValues[2] == 0){
-                    matResultAfterCombine.put(r,c,black_value);
+                    matResultAfterPreCombine.put(r,c,black_value);
                 }
                 else if(farRegionPixelValues[0] == 0 && farRegionPixelValues[1] == 0 && farRegionPixelValues[2] == 0){
-                    matResultAfterCombine.put(r,c,black_value);
+                    matResultAfterPreCombine.put(r,c,black_value);
                 }
                 else
                 {
-                    matResultAfterCombine.put(r,c,white_value);
+                    matResultAfterPreCombine.put(r,c,white_value);
                 }
             }
         }
+    }
+
+    public Mat Combine2ImageWithRegion(Mat nearOriginal, Mat farOriginal)
+    {
+        Mat result = new Mat(nearOriginal.size(),nearOriginal.type());
+        for(int r = 0; r < matResultAfterPreCombine.rows(); r++) {
+            for (int c = 0; c < matResultAfterPreCombine.cols(); c++) {
+                if(matResultAfterPreCombine.get(r,c)[0] == 255 && matResultAfterPreCombine.get(r,c)[1] == 255 && matResultAfterPreCombine.get(r,c)[2] == 255) {
+                    //if white color
+                    result.put(r,c,farOriginal.get(r,c));
+                }
+                else{
+                    result.put(r,c,nearOriginal.get(r,c));
+                }
+            }
+        }
+        return result;
     }
 }

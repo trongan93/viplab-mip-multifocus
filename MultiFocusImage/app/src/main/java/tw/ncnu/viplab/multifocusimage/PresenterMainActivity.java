@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
-import org.opencv.calib3d.StereoBM;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.KeyPoint;
@@ -30,7 +29,6 @@ import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
@@ -447,10 +445,13 @@ public class PresenterMainActivity {
          * July 4th 2017
          */
         ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
+        Mat result = Combine2Image.Combine2ImageWithRegion(inputMat1,inputMat2);
 
+//        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
+//        ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
 
-        ShowImage(processedImageView1, Combine2Image.matResultAfterCombine);
-        ShowImage(processedImageView2, Combine2Image.matResultAfterCombine);
+        ShowImage(processedImageView1, result);
+        ShowImage(processedImageView2, result);
 
     }
     public void Progress2017FebWeek4(){
