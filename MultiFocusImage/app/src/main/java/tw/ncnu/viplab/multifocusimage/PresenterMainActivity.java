@@ -231,6 +231,9 @@ public class PresenterMainActivity {
         Imgproc.cvtColor(inputMat1,processedMat1,Imgproc.COLOR_RGBA2RGB);
         Imgproc.cvtColor(inputMat2,processedMat2, Imgproc.COLOR_RGBA2RGB);
 
+        ShowImage(processedImageView1,processedMat1);
+        ShowImage(processedImageView2,processedMat2);
+
         //Scalar in function drawKeypoints is color of Keypoint
         //DrawMatchesFlags
         //DEFAULT = 0, // Output image matrix will be created (Mat::create), i.e. existing memory of output image may be reused. Two source images, matches, and single keypoints will be drawn. For each keypoint, only the center point will be drawn (without a circle around the keypoint with the keypoint size and orientation).
@@ -369,10 +372,10 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView2, mat2DetectByColor);
 
         //Get Heat Map
-        Mat colorMap1 = new Mat();
-        Mat colorMap2 = new Mat();
-        colorMap1 = GetColorMap(inputMat1);
-        colorMap2 = GetColorMap(inputMat2);
+//        Mat colorMap1 = new Mat();
+//        Mat colorMap2 = new Mat();
+//        colorMap1 = GetColorMap(inputMat1);
+//        colorMap2 = GetColorMap(inputMat2);
 //        ShowImage(processedImageView1,heatMap1);
 //        ShowImage(processedImageView2, heatMap2);
 
@@ -394,13 +397,17 @@ public class PresenterMainActivity {
 
         //Apply watershed to detect region
         //Best apply WaterShed
+        Mat waterShedMatInput1 = inputMat1.clone();
+        Mat waterShedMatInput2 = inputMat2.clone();
         Mat appliedWaterShed1 = new Mat();
         Mat appliedWaterShed2 = new Mat();
-        appliedWaterShed1 = StepToWaterShed(inputMat1);
-        appliedWaterShed2 = StepToWaterShed(inputMat2);
+        appliedWaterShed1 = StepToWaterShed(waterShedMatInput1);
+        appliedWaterShed2 = StepToWaterShed(waterShedMatInput2);
 //        ShowImage(processedImageView1, appliedWaterShed1);
 //        ShowImage(processedImageView2, appliedWaterShed2);
 
+        ShowImage(processedImageView1,inputMat1);
+        ShowImage(processedImageView2,inputMat2);
         //Map Gradient 1st
         Mat processMat1_edgeStrenght = new Mat();
         Mat processMat2_edgeStrenght = new Mat();
@@ -412,10 +419,10 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView2, processMat2_edgeStrenght);
 
         //Compile watershed result and map gradient result and ColorMap
-        Mat regionsOfImage1 = new Mat();
-        Mat regionsOfImage2 = new Mat();
-        regionsOfImage1 = DetectRegionOfImage(inputMat1, processMat1_edgeStrenght,appliedWaterShed1, colorMap1, processedMat1_detectedEdges);
-        regionsOfImage2 = DetectRegionOfImage(inputMat2, processMat2_edgeStrenght, appliedWaterShed2, colorMap2, processedMat2_detectedEdges);
+//        Mat regionsOfImage1 = new Mat();
+//        Mat regionsOfImage2 = new Mat();
+//        regionsOfImage1 = DetectRegionOfImage(inputMat1, processMat1_edgeStrenght,appliedWaterShed1, colorMap1, processedMat1_detectedEdges);
+//        regionsOfImage2 = DetectRegionOfImage(inputMat2, processMat2_edgeStrenght, appliedWaterShed2, colorMap2, processedMat2_detectedEdges);
 //        ShowImage(processedImageView1,regionsOfImage1);
 //        ShowImage(processedImageView2,regionsOfImage2);
 
@@ -430,10 +437,14 @@ public class PresenterMainActivity {
          * Last Modifed: June 27 2017
          * Image Segmentaion
          */
+        Mat inputImageSegmentation1 = inputMat1.clone();
+        Mat intputImageSegmentation2 = inputMat2.clone();
+        Imgproc.cvtColor(inputImageSegmentation1,inputImageSegmentation1,Imgproc.COLOR_BGRA2BGR);
+        Imgproc.cvtColor(intputImageSegmentation2,intputImageSegmentation2,Imgproc.COLOR_BGRA2BGR);
         Mat imageSegmentation1 = new Mat();
         Mat imageSegmentation2 = new Mat();
-        ImageSegmentation ImageSegmetation1 = new ImageSegmentation(inputMat1, processedMat1_detectedEdges, appliedWaterShed1);
-        ImageSegmentation ImageSegmetation2 = new ImageSegmentation(inputMat1, processMat2_edgeStrenght, appliedWaterShed2);
+        ImageSegmentation ImageSegmetation1 = new ImageSegmentation(inputImageSegmentation1, processedMat1_detectedEdges, appliedWaterShed1);
+        ImageSegmentation ImageSegmetation2 = new ImageSegmentation(intputImageSegmentation2, processMat2_edgeStrenght, appliedWaterShed2);
         imageSegmentation1 = ImageSegmetation1.GetResult();
         imageSegmentation2 = ImageSegmetation2.GetResult();
 
@@ -441,17 +452,17 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, imageSegmentation1);
 //        ShowImage(processedImageView2, imageSegmentation2);
 
-        /**
-         * July 4th 2017
-         */
+//        /**
+//         * July 4th 2017
+//         */
         ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
         Mat result = Combine2Image.Combine2ImageWithRegion(inputMat1,inputMat2);
-
-//        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
-//        ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
-
-        ShowImage(processedImageView1, result);
-        ShowImage(processedImageView2, result);
+//
+////        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
+////        ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
+//
+//        ShowImage(processedImageView1, result);
+//        ShowImage(processedImageView2, result);
 
     }
     public void Progress2017FebWeek4(){
