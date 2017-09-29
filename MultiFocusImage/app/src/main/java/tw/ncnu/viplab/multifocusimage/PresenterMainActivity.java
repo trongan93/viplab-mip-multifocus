@@ -863,8 +863,8 @@ public class PresenterMainActivity {
         Scalar upper_green = new Scalar(70,255,255);
 
         //Define range of red color in HSV
-        Scalar lower_red = new Scalar(0,156,168);
-        Scalar upper_red = new Scalar(165,201,219);
+        Scalar lower_flower_pink = new Scalar(0,112,168);
+        Scalar upper_flower_pink = new Scalar(175,205,219);
 
         //Threshold the HSV image to get only blue color
         Mat mask_blue = new Mat();
@@ -873,15 +873,15 @@ public class PresenterMainActivity {
         Mat mask_green = new Mat();
         Core.inRange(hsv_green,lower_green,upper_green,mask_green);
 
-        Mat mask_red = new Mat();
-        Core.inRange(hsv_red,lower_red,upper_red,mask_red);
+        Mat mask_flower_pink = new Mat();
+        Core.inRange(hsv_red,lower_flower_pink,upper_flower_pink,mask_flower_pink);
 
         //Customization add blue and green mask
         Mat mask = new Mat();
 //        Core.add(mask_blue,mask_green,mask);
-        Core.add(mask_red,mask_green,mask);
-        Core.add(mask,mask_blue,mask);
-//        mask = mask_red;
+//        Core.add(mask_flower_pink,mask_green,mask);
+//        Core.add(mask,mask_blue,mask);
+        mask = mask_flower_pink;
 
         //Bitwise-AND mask and original image
         Core.bitwise_and(inputMat,inputMat,result,mask);
