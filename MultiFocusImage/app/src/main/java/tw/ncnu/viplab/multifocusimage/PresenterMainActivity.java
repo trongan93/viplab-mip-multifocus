@@ -371,13 +371,20 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, mat1DetectByColor);
 //        ShowImage(processedImageView2, mat2DetectByColor);
 
-        //Get Heat Map
+        //Detect Object by Color
 //        Mat colorMap1 = new Mat();
 //        Mat colorMap2 = new Mat();
 //        colorMap1 = GetColorMap(inputMat1);
 //        colorMap2 = GetColorMap(inputMat2);
-//        ShowImage(processedImageView1,heatMap1);
-//        ShowImage(processedImageView2, heatMap2);
+//        ShowImage(processedImageView1,colorMap1);
+//        ShowImage(processedImageView2, colorMap2);
+
+        Mat objectTrackingByColorMat1 = new Mat();
+        Mat objectTrackingByColorMat2 = new Mat();
+        objectTrackingByColorMat1 = ObjectTrackingByColor(inputMat1);
+        objectTrackingByColorMat2 = ObjectTrackingByColor(inputMat2);
+        ShowImage(processedImageView1,objectTrackingByColorMat1);
+        ShowImage(processedImageView2,objectTrackingByColorMat2);
 
         //De Noising
 //        Mat deNoisingImage1 = new Mat();
@@ -406,8 +413,8 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, appliedWaterShed1);
 //        ShowImage(processedImageView2, appliedWaterShed2);
 
-        ShowImage(processedImageView1,inputMat1);
-        ShowImage(processedImageView2,inputMat2);
+//        ShowImage(processedImageView1,inputMat1);
+//        ShowImage(processedImageView2,inputMat2);
         //Map Gradient 1st
         Mat processMat1_edgeStrenght = new Mat();
         Mat processMat2_edgeStrenght = new Mat();
@@ -434,7 +441,7 @@ public class PresenterMainActivity {
 
 
         /**June 24 2017
-         * Last Modifed: June 27 2017
+         * Last Modifed: September 28th 2017
          * Image Segmentaion
          */
         Mat inputImageSegmentation1 = inputMat1.clone();
@@ -458,8 +465,8 @@ public class PresenterMainActivity {
         ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
         Mat result = Combine2Image.Combine2ImageWithRegion(inputMat1,inputMat2);
 //
-////        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
-////        ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
+//        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
+//        ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
 //
 //        ShowImage(processedImageView1, result);
 //        ShowImage(processedImageView2, result);
@@ -835,4 +842,50 @@ public class PresenterMainActivity {
         return output;
     }
 
+
+    private Mat ObjectTrackingByColor(Mat inputMat)
+    {
+        Imgproc.cvtColor(inputMat,inputMat,Imgproc.COLOR_BGRA2BGR);
+        Mat result = new Mat();
+        Mat hsv_input = new Mat();
+        //Convert BGR to HSV
+        Imgproc.cvtColor(inputMat,hsv_input,Imgproc.COLOR_BGR2HSV);
+        Mat hsv_blue = hsv_input.clone();
+        Mat hsv_green = hsv_input.clone();
+        Mat hsv_red = hsv_input.clone();
+
+        //Define range of blue color in HSV
+        Scalar lower_blue = new Scalar(110,50,50);
+        Scalar upper_blue = new Scalar(130,255,255);
+
+        //Define range of green color in HSV
+        Scalar lower_green = new Scalar(50,100,100);
+        Scalar upper_green = new Scalar(70,255,255);
+
+        //Define range of red color in HSV
+        Scalar lower_red = new Scalar(150,0,0);
+        Scalar upper_red = new Scalar(180,255,255);
+
+        //Threshold the HSV image to get only blue color
+        Mat mask_blue = new Mat();
+        Core.inRange(hsv_blue,lower_blue,upper_blue,mask_blue);
+        //Threshold the HSV image to get only green color
+        Mat mask_green = new Mat();
+        Core.inRange(hsv_green,lower_green,upper_green,mask_green);
+
+        Mat mask_red = new Mat();
+        Core.inRange(hsv_red,lower_red,upper_red,mask_red);
+
+        //Customization add blue and green mask
+        Mat mask = new Mat();
+//        Core.add(mask_blue,mask_green,mask);
+        mask = mask_red;
+
+        //Bitwise-AND mask and original image
+        Core.bitwise_and(inputMat,inputMat,result,mask);
+
+        //Get result
+//        result = mask;
+        return result;
+    }
 }
