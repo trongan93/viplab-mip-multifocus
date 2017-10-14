@@ -379,12 +379,27 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1,colorMap1);
 //        ShowImage(processedImageView2, colorMap2);
 
+        /*
+        Object Tracking by Color
+        Method 1: Tracking by HSV values
+         */
         Mat objectTrackingByColorMat1 = new Mat();
         Mat objectTrackingByColorMat2 = new Mat();
         objectTrackingByColorMat1 = ObjectTrackingByColor(inputMat1);
         objectTrackingByColorMat2 = ObjectTrackingByColor(inputMat2);
         ShowImage(processedImageView1,objectTrackingByColorMat1);
         ShowImage(processedImageView2,objectTrackingByColorMat2);
+
+        /*
+        Object Tracking by color
+        Method 2: Tracking by Object Split Channel
+         */
+//        Mat objectTrackingByColorMethod2Mat1 = new Mat();
+//        Mat objectTrackingByColorMethod2Mat2 = new Mat();
+//        objectTrackingByColorMethod2Mat1 = SplitImageChannelByColor(inputMat1);
+//        objectTrackingByColorMethod2Mat2 = SplitImageChannelByColor(inputMat2);
+//        ShowImage(processedImageView1,objectTrackingByColorMethod2Mat1);
+//        ShowImage(processedImageView2,objectTrackingByColorMethod2Mat2);
 
         //De Noising
 //        Mat deNoisingImage1 = new Mat();
@@ -850,6 +865,10 @@ public class PresenterMainActivity {
         Mat hsv_input = new Mat();
         //Convert BGR to HSV
         Imgproc.cvtColor(inputMat,hsv_input,Imgproc.COLOR_BGR2HSV);
+
+
+        //Define mask old version
+        /*
         Mat hsv_blue = hsv_input.clone();
         Mat hsv_green = hsv_input.clone();
         Mat hsv_red = hsv_input.clone();
@@ -878,16 +897,76 @@ public class PresenterMainActivity {
 
         //Customization add blue and green mask
         Mat mask = new Mat();
-//        Core.add(mask_blue,mask_green,mask);
-//        Core.add(mask_flower_pink,mask_green,mask);
-//        Core.add(mask,mask_blue,mask);
+        Core.add(mask_blue,mask_green,mask);
+        Core.add(mask_flower_pink,mask_green,mask);
+        Core.add(mask,mask_blue,mask);
         mask = mask_flower_pink;
 
         //Bitwise-AND mask and original image
         Core.bitwise_and(inputMat,inputMat,result,mask);
 
         //Get result
-//        result = mask;
+        result = mask;
+        */
+
+
+        //Define mask and detect - New Version
+        /*
+        Mat hsv_Orange = hsv_input.clone();
+        Mat hsv_Yellow = hsv_input.clone();
+        Mat hsv_Green = hsv_input.clone();
+        Mat hsv_Blue = hsv_input.clone();
+        Mat hsv_Violet = hsv_input.clone();
+        Mat hsv_Red = hsv_input.clone();
+
+        Core.inRange(hsv_Orange, new Scalar(0,100,60), new Scalar(22,255,255),hsv_Orange);
+        Core.inRange(hsv_Yellow, new Scalar(22,100,60), new Scalar(38,255,255),hsv_Yellow);
+        Core.inRange(hsv_Green, new Scalar(38,100,60),new Scalar(75,255,255),hsv_Green);
+        Core.inRange(hsv_Blue, new Scalar(75,100,60),new Scalar(130,255,255),hsv_Blue);
+        Core.inRange(hsv_Violet, new Scalar(130,100,60),new Scalar(160,255,255),hsv_Violet);
+        Core.inRange(hsv_Red,new Scalar(160,100,60), new Scalar(179,255,255),hsv_Red);
+
+        Mat mask = new Mat();
+        Core.add(hsv_Orange,hsv_Yellow,mask);
+        Core.add(mask,hsv_Green,mask);
+        Core.add(mask,hsv_Blue,mask);
+        Core.add(mask,hsv_Violet,mask);
+        Core.add(mask,hsv_Red,mask);
+
+//        Core.add(hsv_Green,hsv_Blue,mask);
+//        Core.add(mask,hsv_Red,mask);
+
+        Core.bitwise_and(inputMat,inputMat,result,mask);
+        */
+
+        //Define mask and detect - New Version
+        //Define with difference U and V
+        Mat hsv_s_v_min = hsv_input.clone();
+        Mat hsv_s_v_mid = hsv_input.clone();
+
+        Core.inRange(hsv_s_v_min,new Scalar(0,0,0),new Scalar(179,100,80),hsv_s_v_min);
+        Core.inRange(hsv_s_v_mid,new Scalar(0,100,80),new Scalar(179,255,255),hsv_s_v_mid);
+        Mat mask = hsv_s_v_mid;
+        Core.bitwise_and(inputMat,inputMat,result,mask);
+
+        return result;
+    }
+
+
+    private Mat SplitImageChannelByColor(Mat inputMat)
+    {
+        Imgproc.cvtColor(inputMat,inputMat,Imgproc.COLOR_BGRA2BGR);
+        List<Mat>channels = new ArrayList<>();
+        Core.split(inputMat,channels);
+        Log.d("anbt-channel size", String.valueOf(channels.size()));
+        Mat blue_mat = channels.get(0);
+        Mat green_mat = channels.get(1);
+        Mat red_mat = channels.get(2);
+        Imgproc.threshold(blue_mat,blue_mat,170,255,Imgproc.THRESH_BINARY);
+        Imgproc.threshold(green_mat,green_mat,170,255,Imgproc.THRESH_BINARY);
+        Imgproc.threshold(red_mat,red_mat,170,255,Imgproc.THRESH_BINARY);
+        Mat result = new Mat();
+        result = blue_mat;
         return result;
     }
 }
