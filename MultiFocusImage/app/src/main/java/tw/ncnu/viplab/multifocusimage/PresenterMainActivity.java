@@ -228,8 +228,8 @@ public class PresenterMainActivity {
         processedMat1 = new Mat();
         processedMat2 = new Mat();
 
-        Imgproc.cvtColor(inputMat1,processedMat1,Imgproc.COLOR_RGBA2BGR);
-        Imgproc.cvtColor(inputMat2,processedMat2, Imgproc.COLOR_RGBA2BGR);
+        Imgproc.cvtColor(inputMat1,processedMat1,Imgproc.COLOR_BGRA2BGR);
+        Imgproc.cvtColor(inputMat2,processedMat2, Imgproc.COLOR_BGRA2BGR);
 
 //        ShowImage(processedImageView1,processedMat1);
 //        ShowImage(processedImageView2,processedMat2);
@@ -244,8 +244,8 @@ public class PresenterMainActivity {
         Features2d.drawKeypoints(processedMat1,keypoints1,processedMat1,new Scalar(255,255,0),4);
         Features2d.drawKeypoints(processedMat2,keypoints2,processedMat2,new Scalar(255,255,0),4);
 
-        ShowImage(processedImageView1, processedMat1);
-        ShowImage(processedImageView2, processedMat2);
+//        ShowImage(processedImageView1, processedMat1);
+//        ShowImage(processedImageView2, processedMat2);
 
         Mat input1Mat = new Mat();
         Mat input2Mat = new Mat();
@@ -399,8 +399,8 @@ public class PresenterMainActivity {
         Mat objectTrackingByColorMat2 = new Mat();
         objectTrackingByColorMat1 = ObjectTrackingByColor(inputMat1);
         objectTrackingByColorMat2 = ObjectTrackingByColor(inputMat2);
-//        ShowImage(processedImageView1,objectTrackingByColorMat1);
-//        ShowImage(processedImageView2,objectTrackingByColorMat2);
+        ShowImage(processedImageView1,objectTrackingByColorMat1);
+        ShowImage(processedImageView2,objectTrackingByColorMat2);
 
         /*
         Object Tracking by color
@@ -958,9 +958,9 @@ public class PresenterMainActivity {
 
         Core.inRange(hsv_s_v_min,new Scalar(0,0,0),new Scalar(179,100,80),hsv_s_v_min);
         Core.inRange(hsv_s_v_mid,new Scalar(0,100,80),new Scalar(179,255,255),hsv_s_v_mid);
-        Mat mask = hsv_s_v_mid;
-        Core.bitwise_and(inputMat,inputMat,result,mask);
-
+        Mat mask = hsv_s_v_min;
+//        Core.bitwise_and(inputMat,inputMat,result,mask);
+        result = mask;
         return result;
     }
 
@@ -978,7 +978,7 @@ public class PresenterMainActivity {
         Imgproc.threshold(green_mat,green_mat,170,255,Imgproc.THRESH_BINARY);
         Imgproc.threshold(red_mat,red_mat,170,255,Imgproc.THRESH_BINARY);
         Mat result = new Mat();
-        result = blue_mat;
+        result = red_mat;
         return result;
     }
 
