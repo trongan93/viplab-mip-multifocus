@@ -228,11 +228,11 @@ public class PresenterMainActivity {
         processedMat1 = new Mat();
         processedMat2 = new Mat();
 
-        Imgproc.cvtColor(inputMat1,processedMat1,Imgproc.COLOR_RGBA2RGB);
-        Imgproc.cvtColor(inputMat2,processedMat2, Imgproc.COLOR_RGBA2RGB);
+        Imgproc.cvtColor(inputMat1,processedMat1,Imgproc.COLOR_RGBA2BGR);
+        Imgproc.cvtColor(inputMat2,processedMat2, Imgproc.COLOR_RGBA2BGR);
 
-        ShowImage(processedImageView1,processedMat1);
-        ShowImage(processedImageView2,processedMat2);
+//        ShowImage(processedImageView1,processedMat1);
+//        ShowImage(processedImageView2,processedMat2);
 
         //Scalar in function drawKeypoints is color of Keypoint
         //DrawMatchesFlags
@@ -243,6 +243,18 @@ public class PresenterMainActivity {
         // the circle around keypoint with keypoint size and orientation will be drawn.
         Features2d.drawKeypoints(processedMat1,keypoints1,processedMat1,new Scalar(255,255,0),4);
         Features2d.drawKeypoints(processedMat2,keypoints2,processedMat2,new Scalar(255,255,0),4);
+
+        ShowImage(processedImageView1, processedMat1);
+        ShowImage(processedImageView2, processedMat2);
+
+        Mat input1Mat = new Mat();
+        Mat input2Mat = new Mat();
+
+        Mat detectColorWithKeypointsMat1 = new Mat();
+        Mat detectColorWithKeypointsMat2 = new Mat();
+
+//        detectColorWithKeypointsMat1 = DetectColorWithKeyPoints(keypoints1);
+
 
 //        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
 //        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(4);
@@ -387,8 +399,8 @@ public class PresenterMainActivity {
         Mat objectTrackingByColorMat2 = new Mat();
         objectTrackingByColorMat1 = ObjectTrackingByColor(inputMat1);
         objectTrackingByColorMat2 = ObjectTrackingByColor(inputMat2);
-        ShowImage(processedImageView1,objectTrackingByColorMat1);
-        ShowImage(processedImageView2,objectTrackingByColorMat2);
+//        ShowImage(processedImageView1,objectTrackingByColorMat1);
+//        ShowImage(processedImageView2,objectTrackingByColorMat2);
 
         /*
         Object Tracking by color
@@ -967,6 +979,14 @@ public class PresenterMainActivity {
         Imgproc.threshold(red_mat,red_mat,170,255,Imgproc.THRESH_BINARY);
         Mat result = new Mat();
         result = blue_mat;
+        return result;
+    }
+
+    private Mat DetectColorWithKeyPoints(MatOfKeyPoint keypoints)
+    {
+        List<KeyPoint> points = keypoints.toList();
+
+        Mat result = new Mat();
         return result;
     }
 }
