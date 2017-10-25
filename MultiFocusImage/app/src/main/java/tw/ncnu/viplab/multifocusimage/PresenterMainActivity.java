@@ -395,23 +395,23 @@ public class PresenterMainActivity {
         Object Tracking by Color
         Method 1: Tracking by HSV values
          */
-        Mat objectTrackingByColorMat1 = new Mat();
-        Mat objectTrackingByColorMat2 = new Mat();
-        objectTrackingByColorMat1 = ObjectTrackingByColor(inputMat1);
-        objectTrackingByColorMat2 = ObjectTrackingByColor(inputMat2);
-        ShowImage(processedImageView1,objectTrackingByColorMat1);
-        ShowImage(processedImageView2,objectTrackingByColorMat2);
+//        Mat objectTrackingByColorMat1 = new Mat();
+//        Mat objectTrackingByColorMat2 = new Mat();
+//        objectTrackingByColorMat1 = ObjectTrackingByColor(inputMat1);
+//        objectTrackingByColorMat2 = ObjectTrackingByColor(inputMat2);
+//        ShowImage(processedImageView1,objectTrackingByColorMat1);
+//        ShowImage(processedImageView2,objectTrackingByColorMat2);
 
         /*
         Object Tracking by color
         Method 2: Tracking by Object Split Channel
          */
-//        Mat objectTrackingByColorMethod2Mat1 = new Mat();
-//        Mat objectTrackingByColorMethod2Mat2 = new Mat();
-//        objectTrackingByColorMethod2Mat1 = SplitImageChannelByColor(inputMat1);
-//        objectTrackingByColorMethod2Mat2 = SplitImageChannelByColor(inputMat2);
-//        ShowImage(processedImageView1,objectTrackingByColorMethod2Mat1);
-//        ShowImage(processedImageView2,objectTrackingByColorMethod2Mat2);
+        Mat objectTrackingByColorMethod2Mat1 = new Mat();
+        Mat objectTrackingByColorMethod2Mat2 = new Mat();
+        objectTrackingByColorMethod2Mat1 = SplitImageChannelByColor(inputMat1);
+        objectTrackingByColorMethod2Mat2 = SplitImageChannelByColor(inputMat2);
+        ShowImage(processedImageView1,objectTrackingByColorMethod2Mat1);
+        ShowImage(processedImageView2,objectTrackingByColorMethod2Mat2);
 
         //De Noising
 //        Mat deNoisingImage1 = new Mat();
@@ -967,18 +967,33 @@ public class PresenterMainActivity {
 
     private Mat SplitImageChannelByColor(Mat inputMat)
     {
-        Imgproc.cvtColor(inputMat,inputMat,Imgproc.COLOR_BGRA2BGR);
+        Imgproc.cvtColor(inputMat,inputMat,Imgproc.COLOR_RGBA2RGB);
         List<Mat>channels = new ArrayList<>();
         Core.split(inputMat,channels);
         Log.d("anbt-channel size", String.valueOf(channels.size()));
-        Mat blue_mat = channels.get(0);
+        Mat red_mat = channels.get(0);
         Mat green_mat = channels.get(1);
-        Mat red_mat = channels.get(2);
-        Imgproc.threshold(blue_mat,blue_mat,170,255,Imgproc.THRESH_BINARY);
-        Imgproc.threshold(green_mat,green_mat,170,255,Imgproc.THRESH_BINARY);
-        Imgproc.threshold(red_mat,red_mat,170,255,Imgproc.THRESH_BINARY);
+        Mat blue_mat = channels.get(2);
+
+        //simple threshold
+//        Imgproc.threshold(red_mat,red_mat,120,255,Imgproc.THRESH_BINARY);
+//        Imgproc.threshold(green_mat,green_mat,120,255,Imgproc.THRESH_BINARY);
+//        Imgproc.threshold(blue_mat,blue_mat,120,255,Imgproc.THRESH_BINARY);
+
+        //adaptive threshold
+//        Imgproc.adaptiveThreshold(red_mat,red_mat,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY,29,12);
+        Imgproc.adaptiveThreshold(red_mat,red_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
+        Imgproc.adaptiveThreshold(green_mat,green_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
+        Imgproc.adaptiveThreshold(blue_mat,blue_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
+
+        Mat gray_input = new Mat();
+        Imgproc.cvtColor(inputMat,gray_input,Imgproc.COLOR_BGR2GRAY);
+        Imgproc.adaptiveThreshold(gray_input,gray_input,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
+
         Mat result = new Mat();
-        result = red_mat;
+        //Connect
+//        result = FloodFill(gray_input);
+        result = gray_input;
         return result;
     }
 
@@ -987,6 +1002,21 @@ public class PresenterMainActivity {
         List<KeyPoint> points = keypoints.toList();
 
         Mat result = new Mat();
+        return result;
+    }
+
+    private Mat FloodFill(Mat inputMatThreshold){
+        Mat result = new Mat();
+        // Floodfill from point (0, 0)
+        Mat floodfilled = Mat.zeros(inputMatThreshold.rows() + 2, inputMatThreshold.cols() + 2, CvType.CV_8U);
+        Imgproc.floodFill(inputMatThreshold, floodfilled, new Point(0, 0), new Scalar(255), new Rect(), new Scalar(0), new Scalar(0), 4 + (255 << 8) + Imgproc.FLOODFILL_MASK_ONLY);
+        result = floodfilled;
+        // Invert floodfilled image
+        Mat im_floodfill_inv = new Mat();
+//        Core.bitwise_not(im_floodfill, im_floodfill, im_floodfill_inv);
+
+        // Combine the two images to get the foreground.
+//        Core.bitwise_or(inputMatThreshold,im_floodfill_inv,result);
         return result;
     }
 }
