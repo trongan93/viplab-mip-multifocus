@@ -982,7 +982,7 @@ public class PresenterMainActivity {
 
         //adaptive threshold
 //        Imgproc.adaptiveThreshold(red_mat,red_mat,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY,29,12);
-        Imgproc.adaptiveThreshold(red_mat,red_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
+        Imgproc.adaptiveThreshold(red_mat,red_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,75,10);
         Imgproc.adaptiveThreshold(green_mat,green_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
         Imgproc.adaptiveThreshold(blue_mat,blue_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
 
