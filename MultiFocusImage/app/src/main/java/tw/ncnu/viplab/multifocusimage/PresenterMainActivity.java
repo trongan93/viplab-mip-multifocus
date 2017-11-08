@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.KeyPoint;
@@ -19,12 +20,15 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.engine.OpenCVEngineInterface;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.photo.Photo;
 import org.opencv.utils.Converters;
+import org.opencv.video.BackgroundSubtractorMOG2;
+import org.opencv.video.Video;
 
 
 import java.util.ArrayList;
@@ -412,6 +416,23 @@ public class PresenterMainActivity {
         objectTrackingByColorMethod2Mat2 = SplitImageChannelByColor(inputMat2);
         ShowImage(processedImageView1,objectTrackingByColorMethod2Mat1);
         ShowImage(processedImageView2,objectTrackingByColorMethod2Mat2);
+
+        /*
+        Background and Remove Background by OpenCV
+         */
+//        Mat inputMat1RemoveBackground = inputMat1.clone();
+//        Imgproc.cvtColor(inputMat1RemoveBackground,inputMat1RemoveBackground,Imgproc.COLOR_RGBA2RGB);
+//        Mat inputMat2RemoveBackground = inputMat2.clone();
+//        Imgproc.cvtColor(inputMat2RemoveBackground,inputMat2RemoveBackground,Imgproc.COLOR_RGBA2RGB);
+//
+//        Mat fgMaskMOG2Object1 = new Mat();
+//        Mat fgMaskMOG2Object2 = new Mat();
+//        BackgroundSubtractorMOG2 fgbg = Video.createBackgroundSubtractorMOG2();
+//        fgbg.apply(inputMat1RemoveBackground, fgMaskMOG2Object1, 0);
+//        fgbg.apply(inputMat2RemoveBackground, fgMaskMOG2Object2, 0);
+//        ShowImage(processedImageView1, fgMaskMOG2Object1);
+//        ShowImage(processedImageView2, fgMaskMOG2Object2);
+
 
         //De Noising
 //        Mat deNoisingImage1 = new Mat();
@@ -970,10 +991,10 @@ public class PresenterMainActivity {
         Imgproc.cvtColor(inputMat,inputMat,Imgproc.COLOR_RGBA2RGB);
         List<Mat>channels = new ArrayList<>();
         Core.split(inputMat,channels);
-        Log.d("anbt-channel size", String.valueOf(channels.size()));
         Mat red_mat = channels.get(0);
         Mat green_mat = channels.get(1);
         Mat blue_mat = channels.get(2);
+
 
         //simple threshold
 //        Imgproc.threshold(red_mat,red_mat,120,255,Imgproc.THRESH_BINARY);
@@ -982,18 +1003,18 @@ public class PresenterMainActivity {
 
         //adaptive threshold
 //        Imgproc.adaptiveThreshold(red_mat,red_mat,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY,29,12);
-        Imgproc.adaptiveThreshold(red_mat,red_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,75,10);
-        Imgproc.adaptiveThreshold(green_mat,green_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
-        Imgproc.adaptiveThreshold(blue_mat,blue_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
+        Imgproc.adaptiveThreshold(red_mat,red_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,255,2);
+        Imgproc.adaptiveThreshold(green_mat,green_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,255,2); //old is 15/12
+        Imgproc.adaptiveThreshold(blue_mat,blue_mat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,255,2);//old is 15/12
 
         Mat gray_input = new Mat();
         Imgproc.cvtColor(inputMat,gray_input,Imgproc.COLOR_BGR2GRAY);
-        Imgproc.adaptiveThreshold(gray_input,gray_input,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,15,12);
+        Imgproc.adaptiveThreshold(gray_input,gray_input,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,255,2); //old is 141/8
 
         Mat result = new Mat();
         //Connect
 //        result = FloodFill(gray_input);
-        result = gray_input;
+        result = blue_mat;
         return result;
     }
 
