@@ -1,6 +1,9 @@
 package tw.ncnu.viplab.multifocusimage.ImageProcessing;
 
+import android.util.Log;
+
 import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 /**
  * Created by Bui Trong An on 7/4/2017.
@@ -86,6 +89,26 @@ public class ImageCombine2Regions {
                 }
             }
         }
+    }
+
+    public Mat ClearNearRegion(Mat nearOriginal)
+    {
+        Imgproc.cvtColor(nearOriginal,nearOriginal,Imgproc.COLOR_BGRA2BGR);
+        Mat result = new Mat(nearOriginal.size(),nearOriginal.type());
+        Log.d("anbt","type near original: " + nearOriginal.type());
+        for(int r = 0; r < matResultAfterPreCombine.rows(); r++){
+            for(int c = 0; c < matResultAfterPreCombine.cols(); c++){
+                if(matResultAfterPreCombine.get(r,c)[0] == 255 && matResultAfterPreCombine.get(r,c)[1] == 255 && matResultAfterPreCombine.get(r,c)[2] == 255) {
+                    //if white color
+                    result.put(r,c, new double[]{0.0,0.0,0.0});
+                }
+                else
+                {
+                    result.put(r,c,nearOriginal.get(r,c));
+                }
+            }
+        }
+        return result;
     }
 
     public Mat Combine2ImageWithRegion(Mat nearOriginal, Mat farOriginal)

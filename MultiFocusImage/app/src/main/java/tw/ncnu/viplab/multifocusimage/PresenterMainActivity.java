@@ -456,11 +456,16 @@ public class PresenterMainActivity {
 //         * July 4th 2017
 //         */
         ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
-        Mat result = Combine2Image.Combine2ImageWithRegion(inputMat1,inputMat2);
-//
+        
+
         ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
         ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
-//
+
+//        Mat clearNearFocusMat = new Mat();
+//        clearNearFocusMat = Combine2Image.ClearNearRegion(inputMat1);
+//        ShowImage(processedImageView1, clearNearFocusMat);
+
+//        Mat result = Combine2Image.Combine2ImageWithRegion(inputMat1,inputMat2);
 //        ShowImage(processedImageView1, result);
 //        ShowImage(processedImageView2, result);
 
