@@ -66,7 +66,7 @@ public class ImageSegmentation {
 //        Imgproc.erode(cannyEdgeMat,cannyEdgeMat,elementEroding);
 
         //OPTION 2
-        Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(40, 40));//source_1 use 55,55
+        Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(57, 57));//source_1 use 57,57 with 2 edge deteced
         Imgproc.morphologyEx(cannyEdgeMat, cannyEdgeMat, Imgproc.MORPH_CLOSE, structuringElement );
 //        outputMat = cannyEdgeMat;
 
