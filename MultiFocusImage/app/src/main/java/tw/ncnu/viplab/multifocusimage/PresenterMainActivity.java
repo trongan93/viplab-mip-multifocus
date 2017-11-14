@@ -33,6 +33,7 @@ import java.util.List;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageCombine2Regions;
+import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageProcessWithColorInformation;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageSegmentation;
 
 import static org.opencv.core.Core.BORDER_DEFAULT;
@@ -461,9 +462,14 @@ public class PresenterMainActivity {
         ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
         ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
 
-//        Mat clearNearFocusMat = new Mat();
-//        clearNearFocusMat = Combine2Image.ClearNearRegion(inputMat1);
-//        ShowImage(processedImageView1, clearNearFocusMat);
+        Mat clearNearFocusMat = new Mat();
+        clearNearFocusMat = Combine2Image.ClearNearRegion(inputMat1);
+        ShowImage(processedImageView1, clearNearFocusMat);
+
+        ImageProcessWithColorInformation colorProcessing = new ImageProcessWithColorInformation(clearNearFocusMat);
+        Mat red_mask = colorProcessing.red_mask;
+        ShowImage(processedImageView1,red_mask);
+
 
 //        Mat result = Combine2Image.Combine2ImageWithRegion(inputMat1,inputMat2);
 //        ShowImage(processedImageView1, result);
