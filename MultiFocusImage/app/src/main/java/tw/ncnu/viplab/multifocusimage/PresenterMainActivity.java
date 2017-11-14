@@ -406,8 +406,8 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, appliedWaterShed1);
 //        ShowImage(processedImageView2, appliedWaterShed2);
 
-        ShowImage(processedImageView1,inputMat1);
-        ShowImage(processedImageView2,inputMat2);
+//        ShowImage(processedImageView1,inputMat1);
+//        ShowImage(processedImageView2,inputMat2);
         //Map Gradient 1st
         Mat processMat1_edgeStrenght = new Mat();
         Mat processMat2_edgeStrenght = new Mat();
@@ -444,7 +444,7 @@ public class PresenterMainActivity {
         Mat imageSegmentation1 = new Mat();
         Mat imageSegmentation2 = new Mat();
         ImageSegmentation ImageSegmetation1 = new ImageSegmentation(inputImageSegmentation1, processedMat1_detectedEdges, appliedWaterShed1);
-        ImageSegmentation ImageSegmetation2 = new ImageSegmentation(intputImageSegmentation2, processMat2_edgeStrenght, appliedWaterShed2);
+        ImageSegmentation ImageSegmetation2 = new ImageSegmentation(intputImageSegmentation2, processedMat2_detectedEdges, appliedWaterShed2);
         imageSegmentation1 = ImageSegmetation1.GetResult();
         imageSegmentation2 = ImageSegmetation2.GetResult();
 
@@ -458,8 +458,8 @@ public class PresenterMainActivity {
         ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
         Mat result = Combine2Image.Combine2ImageWithRegion(inputMat1,inputMat2);
 //
-////        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
-////        ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
+        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
+        ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
 //
 //        ShowImage(processedImageView1, result);
 //        ShowImage(processedImageView2, result);
