@@ -35,6 +35,7 @@ import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageCombine2Regions;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageProcessWithColorInformation;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageSegmentation;
+import tw.ncnu.viplab.multifocusimage.ImageProcessing.K_MeanProcessing;
 
 import static org.opencv.core.Core.BORDER_DEFAULT;
 import static org.opencv.core.CvType.CV_32F;
@@ -453,30 +454,37 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, imageSegmentation1);
 //        ShowImage(processedImageView2, imageSegmentation2);
 
+        K_MeanProcessing k_mean = new K_MeanProcessing(inputMat1);
+        Mat k_meanResult = k_mean.GetResult();
+        ShowImage(processedImageView1,k_meanResult);
+
+
 //        /**
 //         * July 4th 2017
 //         */
         ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
         
 
-        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
-        ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
+//        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
+//        ShowImage(processedImageView2, Combine2Image.matResultAfterPreCombine);
 
-        Mat clearNearFocusMat = new Mat();
-        clearNearFocusMat = Combine2Image.ClearNearRegion(inputMat1);
-        ShowImage(processedImageView1, clearNearFocusMat);
-
-        ImageProcessWithColorInformation colorProcessing = new ImageProcessWithColorInformation(clearNearFocusMat);
-        Mat red_mask = colorProcessing.red_mask;
-
-        Mat green_mask = colorProcessing.green_mask;
-        Mat blue_mask = colorProcessing.blue_mask;
-        ShowImage(processedImageView1,blue_mask);
-
-
+//        Mat clearNearFocusMat = new Mat();
+//        clearNearFocusMat = Combine2Image.ClearNearRegion(inputMat1);
+//        ShowImage(processedImageView1, clearNearFocusMat);
 //        Mat result = Combine2Image.Combine2ImageWithRegion(inputMat1,inputMat2);
 //        ShowImage(processedImageView1, result);
 //        ShowImage(processedImageView2, result);
+
+        /**
+         * Image processing with color information
+         * Status: Remove
+         */
+//        ImageProcessWithColorInformation colorProcessing = new ImageProcessWithColorInformation(clearNearFocusMat);
+//        Mat red_mask = colorProcessing.red_mask;
+//
+//        Mat green_mask = colorProcessing.green_mask;
+//        Mat blue_mask = colorProcessing.blue_mask;
+//        ShowImage(processedImageView1,blue_mask);
 
     }
     public void Progress2017FebWeek4(){
