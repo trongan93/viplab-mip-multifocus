@@ -468,7 +468,10 @@ public class PresenterMainActivity {
 
         ImageProcessWithColorInformation colorProcessing = new ImageProcessWithColorInformation(clearNearFocusMat);
         Mat red_mask = colorProcessing.red_mask;
-        ShowImage(processedImageView1,red_mask);
+
+        Mat green_mask = colorProcessing.green_mask;
+        Mat blue_mask = colorProcessing.blue_mask;
+        ShowImage(processedImageView1,blue_mask);
 
 
 //        Mat result = Combine2Image.Combine2ImageWithRegion(inputMat1,inputMat2);
