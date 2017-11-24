@@ -30,6 +30,7 @@ import org.opencv.utils.Converters;
 import java.util.ArrayList;
 import java.util.List;
 
+import tw.ncnu.viplab.multifocusimage.ImageProcessing.CombineKeyPointWithCluster;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageCombine2Regions;
@@ -456,7 +457,7 @@ public class PresenterMainActivity {
 
         K_MeanProcessing k_mean = new K_MeanProcessing(inputMat1);
         Mat k_meanResult = k_mean.GetResult();
-        ShowImage(processedImageView1,k_meanResult);
+//        ShowImage(processedImageView1,k_meanResult);
 
 
 //        /**
@@ -485,6 +486,13 @@ public class PresenterMainActivity {
 //        Mat green_mask = colorProcessing.green_mask;
 //        Mat blue_mask = colorProcessing.blue_mask;
 //        ShowImage(processedImageView1,blue_mask);
+
+        /*
+        November 24th 2017
+        Function: Combine Clustering image (k-mean) and keypoints
+         */
+        CombineKeyPointWithCluster combineKeyPointWithCluster = new CombineKeyPointWithCluster(k_meanResult, keypoints1);
+        ShowImage(processedImageView1, combineKeyPointWithCluster.GetResult());
 
     }
     public void Progress2017FebWeek4(){

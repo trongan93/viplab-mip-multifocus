@@ -19,6 +19,7 @@ import java.util.List;
 public class CombineKeyPointWithCluster {
     List<KeyPoint> keypoints = new ArrayList<>();
     Mat clusterMat = new Mat();
+    Mat result = new Mat();
     public CombineKeyPointWithCluster(Mat clusterMat, MatOfKeyPoint matOfKeyPoint){
         this.keypoints = matOfKeyPoint.toList();
         this.clusterMat = clusterMat;
@@ -29,5 +30,9 @@ public class CombineKeyPointWithCluster {
             Point point = keypoint.pt;
             Log.d("anbt","Keypoint location: " + point.x + " : " + point.y);
         }
+
+    }
+    public Mat GetResult(){
+        return result;
     }
 }
