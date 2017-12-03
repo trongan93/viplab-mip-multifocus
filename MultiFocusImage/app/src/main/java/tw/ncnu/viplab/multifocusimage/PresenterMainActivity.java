@@ -482,7 +482,6 @@ public class PresenterMainActivity {
          */
 //        ImageProcessWithColorInformation colorProcessing = new ImageProcessWithColorInformation(clearNearFocusMat);
 //        Mat red_mask = colorProcessing.red_mask;
-//
 //        Mat green_mask = colorProcessing.green_mask;
 //        Mat blue_mask = colorProcessing.blue_mask;
 //        ShowImage(processedImageView1,blue_mask);
@@ -492,7 +491,7 @@ public class PresenterMainActivity {
         Function: Combine Clustering image (k-mean) and keypoints
          */
         CombineKeyPointWithCluster combineKeyPointWithCluster = new CombineKeyPointWithCluster(k_meanResult, keypoints1);
-        ShowImage(processedImageView1, combineKeyPointWithCluster.GetResult());
+//        ShowImage(processedImageView1, combineKeyPointWithCluster.GetResult());
 
     }
     public void Progress2017FebWeek4(){

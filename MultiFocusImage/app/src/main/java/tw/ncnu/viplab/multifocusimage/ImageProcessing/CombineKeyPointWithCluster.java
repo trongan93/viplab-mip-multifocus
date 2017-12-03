@@ -35,4 +35,10 @@ public class CombineKeyPointWithCluster {
     public Mat GetResult(){
         return result;
     }
+    private Mat MapPointToMat(List<Point> points)
+    {
+//        clusterMat.get(new Point())
+        return new Mat();
+
+    }
 }
