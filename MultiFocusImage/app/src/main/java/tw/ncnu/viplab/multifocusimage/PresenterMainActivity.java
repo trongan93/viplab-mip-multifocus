@@ -491,7 +491,9 @@ public class PresenterMainActivity {
         Function: Combine Clustering image (k-mean) and keypoints
          */
         CombineKeyPointWithCluster combineKeyPointWithCluster = new CombineKeyPointWithCluster(k_meanResult, keypoints1);
-//        ShowImage(processedImageView1, combineKeyPointWithCluster.GetResult());
+        Mat nearKeypointsMat = combineKeyPointWithCluster.GetResult();
+        ShowImage(processedImageView1,nearKeypointsMat);
+
 
     }
     public void Progress2017FebWeek4(){
