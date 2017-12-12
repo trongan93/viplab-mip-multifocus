@@ -492,6 +492,8 @@ public class PresenterMainActivity {
          */
         CombineKeyPointWithCluster combineKeyPointWithCluster = new CombineKeyPointWithCluster(k_meanResult, keypoints1);
         Mat nearKeypointsMat = combineKeyPointWithCluster.GetResult();
+        Log.d("anbt","height of nearKeypoints mat = " + nearKeypointsMat.height());
+        Log.d("anbt", "width of nearKeypoints mat = " + nearKeypointsMat.width());
         ShowImage(processedImageView1,nearKeypointsMat);
 
 
