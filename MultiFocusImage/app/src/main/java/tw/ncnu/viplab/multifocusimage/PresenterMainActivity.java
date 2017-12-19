@@ -247,6 +247,8 @@ public class PresenterMainActivity {
         Features2d.drawKeypoints(processedMat1,keypoints1,processedMat1,new Scalar(255,255,0),4);
         Features2d.drawKeypoints(processedMat2,keypoints2,processedMat2,new Scalar(255,255,0),4);
 
+//        ShowImage(processedImageView1,processedMat1);
+//        ShowImage(processedImageView2,processedMat2);
 //        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
 //        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(4);
 //        MatOfDMatch matches = new MatOfDMatch();
@@ -494,7 +496,7 @@ public class PresenterMainActivity {
         Mat nearKeypointsMat = combineKeyPointWithCluster.GetResult();
         Log.d("anbt","height of nearKeypoints mat = " + nearKeypointsMat.height());
         Log.d("anbt", "width of nearKeypoints mat = " + nearKeypointsMat.width());
-        ShowImage(processedImageView1,nearKeypointsMat);
+//        ShowImage(processedImageView1,nearKeypointsMat);
 
 
     }

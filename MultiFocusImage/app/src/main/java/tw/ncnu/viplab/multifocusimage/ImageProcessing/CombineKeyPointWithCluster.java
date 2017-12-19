@@ -123,6 +123,7 @@ public class CombineKeyPointWithCluster {
         }
         Log.d("anbt", "count2 = " + count);
         Log.d("anbt", "size of keypointsValue = " + keyPointsValue.size());
+        result = clusterMat;
     }
 
 

@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/imvOriginal1"
-                app:srcCompat="@drawable/source_image1" />
+                app:srcCompat="@drawable/input_image_basic_near" />
         </LinearLayout>
         <LinearLayout
             android:orientation="vertical"
@@ -39,7 +39,7 @@
                 android:id="@+id/imvOriginal2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:srcCompat="@drawable/source_image2" />
+                app:srcCompat="@drawable/input_image_basic_far" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
