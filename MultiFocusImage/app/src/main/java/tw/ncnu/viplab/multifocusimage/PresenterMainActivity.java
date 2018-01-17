@@ -269,8 +269,8 @@ public class PresenterMainActivity {
         Mat processedMat2_detectedEdges = new Mat();
         processedMat1_detectedEdges = EdgeDetector(inputMat1);
         processedMat2_detectedEdges = EdgeDetector(inputMat2);
-//        ShowImage(processedImageView1, processedMat1_detectedEdges);
-//        ShowImage(processedImageView2, processedMat2_detectedEdges);
+        ShowImage(processedImageView1, processedMat1_detectedEdges);
+        ShowImage(processedImageView2, processedMat2_detectedEdges);
 
 //        Mat map2DetectedEdges = new Mat(processedMat1_detectedEdges.size(), CvType.CV_8U);
 
@@ -448,18 +448,21 @@ public class PresenterMainActivity {
         Imgproc.cvtColor(intputImageSegmentation2,intputImageSegmentation2,Imgproc.COLOR_BGRA2BGR);
         Mat imageSegmentation1 = new Mat();
         Mat imageSegmentation2 = new Mat();
-        ImageSegmentation ImageSegmetation1 = new ImageSegmentation(inputImageSegmentation1, processedMat1_detectedEdges, appliedWaterShed1);
-        ImageSegmentation ImageSegmetation2 = new ImageSegmentation(intputImageSegmentation2, processedMat2_detectedEdges, appliedWaterShed2);
+        ImageSegmentation ImageSegmetation1 = new ImageSegmentation(inputImageSegmentation1, processMat1_edgeStrenght, appliedWaterShed1);
+        ImageSegmentation ImageSegmetation2 = new ImageSegmentation(intputImageSegmentation2, processMat2_edgeStrenght, appliedWaterShed2);
         imageSegmentation1 = ImageSegmetation1.GetResult();
         imageSegmentation2 = ImageSegmetation2.GetResult();
 
 
-//        ShowImage(processedImageView1, imageSegmentation1);
-//        ShowImage(processedImageView2, imageSegmentation2);
+        ShowImage(processedImageView1, imageSegmentation1);
+        ShowImage(processedImageView2, imageSegmentation2);
 
-        K_MeanProcessing k_mean = new K_MeanProcessing(inputMat1);
-        Mat k_meanResult = k_mean.GetResult();
-//        ShowImage(processedImageView1,k_meanResult);
+        K_MeanProcessing k_mean_near = new K_MeanProcessing(inputMat1);
+        K_MeanProcessing k_mean_far = new K_MeanProcessing(inputMat2);
+        Mat k_meanResult_near = k_mean_near.GetResult();
+        Mat k_meanResult_far = k_mean_far.GetResult();
+//        ShowImage(processedImageView1,k_meanResult_near);
+//        ShowImage(processedImageView2, k_meanResult_far);
 
 
 //        /**
@@ -492,11 +495,13 @@ public class PresenterMainActivity {
         November 24th 2017
         Function: Combine Clustering image (k-mean) and keypoints
          */
-        CombineKeyPointWithCluster combineKeyPointWithCluster = new CombineKeyPointWithCluster(k_meanResult, keypoints1);
+        CombineKeyPointWithCluster combineKeyPointWithCluster = new CombineKeyPointWithCluster(k_meanResult_near, keypoints1);
         Mat nearKeypointsMat = combineKeyPointWithCluster.GetResult();
         Log.d("anbt","height of nearKeypoints mat = " + nearKeypointsMat.height());
         Log.d("anbt", "width of nearKeypoints mat = " + nearKeypointsMat.width());
 //        ShowImage(processedImageView1,nearKeypointsMat);
+
+
 
 
     }
@@ -810,7 +815,7 @@ public class PresenterMainActivity {
     }
     private Mat FilterMapStrength(Mat inputMat){
         Mat resultMat = new Mat();
-        Imgproc.threshold(inputMat,resultMat,42,255,Imgproc.THRESH_BINARY);
+        Imgproc.threshold(inputMat,resultMat,42,255,Imgproc.THRESH_BINARY);//original is 42
         return resultMat;
     }
     private Mat DetectRegionOfImage(Mat inputMat, Mat mapStrenght, Mat markerWaterShed, Mat colorMap, Mat cannyDetected){
