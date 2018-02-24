@@ -269,8 +269,8 @@ public class PresenterMainActivity {
         Mat processedMat2_detectedEdges = new Mat();
         processedMat1_detectedEdges = EdgeDetector(inputMat1);
         processedMat2_detectedEdges = EdgeDetector(inputMat2);
-        ShowImage(processedImageView1, processedMat1_detectedEdges);
-        ShowImage(processedImageView2, processedMat2_detectedEdges);
+//        ShowImage(processedImageView1, processedMat1_detectedEdges);
+//        ShowImage(processedImageView2, processedMat2_detectedEdges);
 
 //        Mat map2DetectedEdges = new Mat(processedMat1_detectedEdges.size(), CvType.CV_8U);
 
@@ -417,11 +417,13 @@ public class PresenterMainActivity {
         Mat processMat1_edgeStrenght = new Mat();
         Mat processMat2_edgeStrenght = new Mat();
         processMat1_edgeStrenght = CalculateMapStrength(inputMat1);
-        processMat1_edgeStrenght = FilterMapStrength(processMat1_edgeStrenght);
+//        processMat1_edgeStrenght = FilterMapStrength(processMat1_edgeStrenght);
+        processMat1_edgeStrenght = FilterMapStrengthWithAdaptiveThresholding(processMat1_edgeStrenght);
         processMat2_edgeStrenght = CalculateMapStrength(inputMat2);
-        processMat2_edgeStrenght = FilterMapStrength(processMat2_edgeStrenght);
-//        ShowImage(processedImageView1, processMat1_edgeStrenght);
-//        ShowImage(processedImageView2, processMat2_edgeStrenght);
+//        processMat2_edgeStrenght = FilterMapStrength(processMat2_edgeStrenght);
+        processMat2_edgeStrenght = FilterMapStrengthWithAdaptiveThresholding(processMat2_edgeStrenght);
+        ShowImage(processedImageView1, processMat1_edgeStrenght);
+        ShowImage(processedImageView2, processMat2_edgeStrenght);
 
         //Compile watershed result and map gradient result and ColorMap
 //        Mat regionsOfImage1 = new Mat();
@@ -454,8 +456,8 @@ public class PresenterMainActivity {
         imageSegmentation2 = ImageSegmetation2.GetResult();
 
 
-        ShowImage(processedImageView1, imageSegmentation1);
-        ShowImage(processedImageView2, imageSegmentation2);
+//        ShowImage(processedImageView1, imageSegmentation1);
+//        ShowImage(processedImageView2, imageSegmentation2);
 
         K_MeanProcessing k_mean_near = new K_MeanProcessing(inputMat1);
         K_MeanProcessing k_mean_far = new K_MeanProcessing(inputMat2);
@@ -818,6 +820,13 @@ public class PresenterMainActivity {
         Imgproc.threshold(inputMat,resultMat,42,255,Imgproc.THRESH_BINARY);//original is 42
         return resultMat;
     }
+
+    private Mat FilterMapStrengthWithAdaptiveThresholding(Mat inputMat){
+        Mat resultMat = new Mat();
+        Imgproc.adaptiveThreshold(inputMat,resultMat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,51,0);
+        return resultMat;
+    }
+
     private Mat DetectRegionOfImage(Mat inputMat, Mat mapStrenght, Mat markerWaterShed, Mat colorMap, Mat cannyDetected){
         Mat result = mapStrenght;
 //        for(int r = 0; r < inputMat.rows(); r++){
