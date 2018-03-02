@@ -823,7 +823,8 @@ public class PresenterMainActivity {
 
     private Mat FilterMapStrengthWithAdaptiveThresholding(Mat inputMat){
         Mat resultMat = new Mat();
-        Imgproc.adaptiveThreshold(inputMat,resultMat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,51,0);
+        Imgproc.adaptiveThreshold(inputMat,resultMat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,21,11);
+        //Last version: blockSize is 51 and C is 0
         return resultMat;
     }
 
