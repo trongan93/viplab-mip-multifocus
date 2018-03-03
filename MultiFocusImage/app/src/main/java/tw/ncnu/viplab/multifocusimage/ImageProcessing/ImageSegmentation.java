@@ -18,13 +18,13 @@ import java.util.List;
 
 public class ImageSegmentation {
     private Mat inputMat;
-    private Mat cannyEdgeMat;
+    private Mat edgeMat;
     private Mat waterShedResultMat;
     private Mat outputMat;
 
-    public ImageSegmentation(Mat inputMat, Mat cannyEdgeMat, Mat waterShedResultMat) {
+    public ImageSegmentation(Mat inputMat, Mat edgeMat, Mat waterShedResultMat) {
         this.inputMat = inputMat;
-        this.cannyEdgeMat = cannyEdgeMat;
+        this.edgeMat = edgeMat;
         this.waterShedResultMat = waterShedResultMat;
         this.outputMat = new Mat(inputMat.size(), inputMat.type());
         /**
@@ -58,27 +58,30 @@ public class ImageSegmentation {
 //        //dilating Canny edges
 //        int dilation_size = 6;
 //        Mat elementDilating = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*dilation_size + 1, 2*dilation_size+1));
-//        Imgproc.dilate(cannyEdgeMat,cannyEdgeMat,elementDilating);
+//        Imgproc.dilate(edgeMat,edgeMat,elementDilating);
 //
 //        //Encrosing Canny Edges
 //        int erosion_size = 6;
 //        Mat elementEroding = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2*erosion_size + 1, 2*erosion_size+1));
-//        Imgproc.erode(cannyEdgeMat,cannyEdgeMat,elementEroding);
+//        Imgproc.erode(edgeMat,edgeMat,elementEroding);
 
         //OPTION 2
-        Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(50, 50));//source_1 use 57,57 with 2 edge deteced and MORPH_ELLIPSE --> 35
-        Imgproc.morphologyEx(cannyEdgeMat, cannyEdgeMat, Imgproc.MORPH_TOPHAT , structuringElement );//old is MORPH_CLOSE
-//        outputMat = cannyEdgeMat;
+//        Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(50, 50));//source_1 use 57,57 with 2 edge deteced and MORPH_ELLIPSE --> 35
+//        Imgproc.morphologyEx(edgeMat, edgeMat, Imgproc.MORPH_TOPHAT , structuringElement );//old is MORPH_CLOSE
+//        outputMat = edgeMat;
 
-        //Using result of Canny Edge
+        //OPTION 3 is Adaptive Thresholding
+
+
+        //Using result of Edge
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierachy = new Mat();
-        Imgproc.findContours(cannyEdgeMat,contours,hierachy,Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(edgeMat,contours,hierachy,Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         outputMat = inputMat.clone();
-        for(int i = 0; i < contours.size(); i++){
-            Imgproc.drawContours(outputMat,contours,i, new Scalar(255,255,255),-1);
-        }
-//        Imgproc.drawContours(outputMat,contours,-1, new Scalar(255,255,255),-1);//it is the same for all, when use -1 -> draw all contours
+//        for(int i = 0; i < contours.size(); i++){
+//            Imgproc.drawContours(outputMat,contours,i, new Scalar(255,255,255),-1);
+//        }
+        Imgproc.drawContours(outputMat,contours,-1, new Scalar(255,255,255),-1);//it is the same for all, when use -1 -> draw all contours
 
 
 
