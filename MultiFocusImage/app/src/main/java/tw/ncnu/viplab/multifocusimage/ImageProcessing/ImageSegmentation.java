@@ -66,9 +66,9 @@ public class ImageSegmentation {
 //        Imgproc.erode(edgeMat,edgeMat,elementEroding);
 
         //OPTION 2
-//        Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(50, 50));//source_1 use 57,57 with 2 edge deteced and MORPH_ELLIPSE --> 35
-//        Imgproc.morphologyEx(edgeMat, edgeMat, Imgproc.MORPH_TOPHAT , structuringElement );//old is MORPH_CLOSE
-//        outputMat = edgeMat;
+        Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(10, 10));//source_1 use 57,57 with 2 edge deteced and MORPH_ELLIPSE --> 35
+        Imgproc.morphologyEx(edgeMat, edgeMat, Imgproc.MORPH_TOPHAT , structuringElement );//old is MORPH_CLOSE
+        outputMat = edgeMat;
 
         //OPTION 3 is Adaptive Thresholding
 
@@ -78,10 +78,10 @@ public class ImageSegmentation {
         Mat hierachy = new Mat();
         Imgproc.findContours(edgeMat,contours,hierachy,Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         outputMat = inputMat.clone();
-//        for(int i = 0; i < contours.size(); i++){
-//            Imgproc.drawContours(outputMat,contours,i, new Scalar(255,255,255),-1);
-//        }
-        Imgproc.drawContours(outputMat,contours,-1, new Scalar(255,255,255),-1);//it is the same for all, when use -1 -> draw all contours
+        for(int i = 0; i < contours.size(); i++){
+            Imgproc.drawContours(outputMat,contours,i, new Scalar(0,0,0),-1);
+        }
+//        Imgproc.drawContours(outputMat,contours,-1, new Scalar(255,255,255),-1);//it is the same for all, when use -1 -> draw all contours
 
 
 

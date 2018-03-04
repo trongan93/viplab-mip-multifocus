@@ -1,11 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/trongan93/Project/ViPResearchProject/Multi-FocusApplicationOnMobilePhone/viplab-mip-multifocus/MultiFocusImage/D:\\ViPResearchProject\\MainResearch\\MultiFocusImage\\openCVLibrary310\\build\\intermediates\\res\\merged\\androidTest\\debug\\values_values.arsc.flat",
-            "map": []
-        },
-        {
-            "outputFile": "/Users/trongan93/Project/ViPResearchProject/Multi-FocusApplicationOnMobilePhone/viplab-mip-multifocus/MultiFocusImage/openCVLibrary310/build/intermediates/res/merged/androidTest/debug/values_values.arsc.flat",
+            "outputFile": "D:\\ViPResearchProject\\MainResearch\\MultiFocusImage\\openCVLibrary310\\build\\intermediates\\res\\merged\\androidTest\\debug\\values_values.arsc.flat",
             "map": []
         }
     ]

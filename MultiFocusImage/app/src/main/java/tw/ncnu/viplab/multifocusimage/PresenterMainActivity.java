@@ -30,6 +30,7 @@ import org.opencv.utils.Converters;
 import java.util.ArrayList;
 import java.util.List;
 
+import tw.ncnu.viplab.multifocusimage.ImageProcessing.CombineImageRealMethod;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.CombineKeyPointWithCluster;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ControlImage;
 import tw.ncnu.viplab.multifocusimage.ImageProcessing.ImageBasicProcessing;
@@ -470,7 +471,7 @@ public class PresenterMainActivity {
 //        /**
 //         * July 4th 2017
 //         */
-        ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
+//        ImageCombine2Regions Combine2Image = new ImageCombine2Regions(imageSegmentation1, imageSegmentation2);
         
 
 //        ShowImage(processedImageView1, Combine2Image.matResultAfterPreCombine);
@@ -497,13 +498,17 @@ public class PresenterMainActivity {
         November 24th 2017
         Function: Combine Clustering image (k-mean) and keypoints
          */
-        CombineKeyPointWithCluster combineKeyPointWithCluster = new CombineKeyPointWithCluster(k_meanResult_near, keypoints1);
-        Mat nearKeypointsMat = combineKeyPointWithCluster.GetResult();
-        Log.d("anbt","height of nearKeypoints mat = " + nearKeypointsMat.height());
-        Log.d("anbt", "width of nearKeypoints mat = " + nearKeypointsMat.width());
+//        CombineKeyPointWithCluster combineKeyPointWithCluster = new CombineKeyPointWithCluster(k_meanResult_near, keypoints1);
+//        Mat nearKeypointsMat = combineKeyPointWithCluster.GetResult();
+//        Log.d("anbt","height of nearKeypoints mat = " + nearKeypointsMat.height());
+//        Log.d("anbt", "width of nearKeypoints mat = " + nearKeypointsMat.width());
 //        ShowImage(processedImageView1,nearKeypointsMat);
 
 
+        //March 4th 2018
+        CombineImageRealMethod combineImage = new CombineImageRealMethod(imageSegmentation1,imageSegmentation2,inputMat1,inputMat2);
+        Mat result = combineImage.SFMat();
+        ShowImage(processedImageView1,result);
 
 
     }
