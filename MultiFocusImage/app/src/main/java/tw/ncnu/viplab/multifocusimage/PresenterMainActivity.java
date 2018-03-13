@@ -457,8 +457,8 @@ public class PresenterMainActivity {
         imageSegmentation2 = ImageSegmetation2.GetResult();
 
 
-        ShowImage(processedImageView1, imageSegmentation1);
-        ShowImage(processedImageView2, imageSegmentation2);
+//        ShowImage(processedImageView1, imageSegmentation1);
+//        ShowImage(processedImageView2, imageSegmentation2);
 
         K_MeanProcessing k_mean_near = new K_MeanProcessing(inputMat1);
         K_MeanProcessing k_mean_far = new K_MeanProcessing(inputMat2);
