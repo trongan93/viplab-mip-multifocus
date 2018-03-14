@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MultiFocusImage</string>
+    <string name="get_image_from">Get Image From</string>
+    <string name="get_from_camera">Camera</string>
+    <string name="get_from_gallery">Gallery</string>
+    <string name="cancel">Cancel</string>
 </resources>

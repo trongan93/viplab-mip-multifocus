@@ -1,14 +1,26 @@
 package tw.ncnu.viplab.multifocusimage;
 
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
+import android.support.v4.content.PermissionChecker;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import org.opencv.android.OpenCVLoader;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    private ImageView selectedImageView;
     static {
         if(!OpenCVLoader.initDebug()){
             Log.d(TAG,"OpenCV not loaded");
@@ -23,6 +35,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         processedImage1 = (ImageView)this.findViewById(R.id.imvOriginal1);
         processedImage2 = (ImageView)this.findViewById(R.id.imvOriginal2);
+
+        processedImage1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedImageView = processedImage1;
+                getImage();
+            }
+        });
+
+        processedImage2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedImageView = processedImage2;
+                getImage();
+            }
+        });
 
         presenterMainActivity = new PresenterMainActivity(processedImage1, processedImage2);
 //        presenterMainActivity.Progress2016DecWeek4();
@@ -43,7 +71,50 @@ public class MainActivity extends AppCompatActivity {
 //                return false;
 //            }
 //        });
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case 0:
+                if(resultCode == RESULT_OK){
+                    Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+                    selectedImageView.setImageBitmap(imageBitmap);
+                }
 
+                break;
+            case 1:
+                if(resultCode == RESULT_OK){
+                    Uri selectedImage = data.getData();
+                    selectedImageView.setImageURI(selectedImage);
+                }
+                break;
+        }
+    }
+
+    private void getImage() {
+        final CharSequence[] options = {this.getString(R.string.get_from_camera),
+                this.getString(R.string.get_from_gallery), this.getString(R.string.cancel)};
+        AlertDialog.Builder chooseItem = new AlertDialog.Builder(this);
+        chooseItem.setTitle(this.getString(R.string.get_image_from));
+        chooseItem.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (options[item].equals(getResources().getString(R.string.get_from_camera))) {
+                    dialog.dismiss();
+                    Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(takePicture, 0);
+                } else if (options[item].equals(getResources().getString(R.string.get_from_gallery))) {
+                    dialog.dismiss();
+                    Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(pickPhoto , 1);
+                } else {
+                    dialog.dismiss();
+                }
+            }
+        });
+        chooseItem.show();
     }
 }
