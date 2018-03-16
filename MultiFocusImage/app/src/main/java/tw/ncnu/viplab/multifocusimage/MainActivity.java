@@ -1,10 +1,12 @@
 package tw.ncnu.viplab.multifocusimage;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -14,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import org.opencv.android.OpenCVLoader;
@@ -21,6 +24,7 @@ import org.opencv.android.OpenCVLoader;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private ImageView selectedImageView;
+    private Bitmap preProcessImage;
     static {
         if(!OpenCVLoader.initDebug()){
             Log.d(TAG,"OpenCV not loaded");
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 //        System.loadLibrary("opencvNative");
     }
     ImageView processedImage1, processedImage2;
+    Button btnProcessing;
     PresenterMainActivity presenterMainActivity;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         processedImage1 = (ImageView)this.findViewById(R.id.imvOriginal1);
         processedImage2 = (ImageView)this.findViewById(R.id.imvOriginal2);
+        btnProcessing = (Button)this.findViewById(R.id.btnProcessing);
 
         processedImage1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,12 +58,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        presenterMainActivity = new PresenterMainActivity(processedImage1, processedImage2);
+        btnProcessing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                preProcessImage = ((BitmapDrawable)processedImage1.getDrawable()).getBitmap();
+                btnProcessing.setVisibility(View.INVISIBLE);
+                processedImage2.setVisibility(View.INVISIBLE);
+
+                presenterMainActivity = new PresenterMainActivity(processedImage1, processedImage2);
 //        presenterMainActivity.Progress2016DecWeek4();
-        presenterMainActivity.MainProcess();
-        //Focus Touch and detect object
-        //presenterMainActivity.Progress2017FebWeek4();
-        presenterMainActivity.onTouchImageView();
+                presenterMainActivity.MainProcess();
+                //Focus Touch and detect object
+                //presenterMainActivity.Progress2017FebWeek4();
+                presenterMainActivity.onTouchImageView();
+            }
+        });
+
 //        final List<Integer> RGBValueNearFocusTouched = new ArrayList<>();
 //        final Bitmap bitmapNearFocus = ((BitmapDrawable)processedImage1.getDrawable()).getBitmap();
 //        processedImage1.setOnTouchListener(new View.OnTouchListener() {
@@ -71,6 +87,14 @@ public class MainActivity extends AppCompatActivity {
 //                return false;
 //            }
 //        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        //back to previous state
+        processedImage1.setImageBitmap(preProcessImage);
+        btnProcessing.setVisibility(View.VISIBLE);
+        processedImage2.setVisibility(View.VISIBLE);
     }
 
     @Override

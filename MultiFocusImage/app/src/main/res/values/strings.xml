@@ -4,4 +4,5 @@
     <string name="get_from_camera">Camera</string>
     <string name="get_from_gallery">Gallery</string>
     <string name="cancel">Cancel</string>
+    <string name="processing">Processing</string>
 </resources>
