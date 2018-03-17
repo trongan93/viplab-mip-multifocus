@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
@@ -61,16 +62,30 @@ public class MainActivity extends AppCompatActivity {
         btnProcessing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                preProcessImage = ((BitmapDrawable)processedImage1.getDrawable()).getBitmap();
-                btnProcessing.setVisibility(View.INVISIBLE);
-                processedImage2.setVisibility(View.INVISIBLE);
+                final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+                dialog.setMessage("Processing. Please Wait!");
+                dialog.show();
 
-                presenterMainActivity = new PresenterMainActivity(processedImage1, processedImage2);
+                preProcessImage = ((BitmapDrawable)processedImage1.getDrawable()).getBitmap();
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        presenterMainActivity = new PresenterMainActivity(processedImage1, processedImage2);
 //        presenterMainActivity.Progress2016DecWeek4();
-                presenterMainActivity.MainProcess();
-                //Focus Touch and detect object
-                //presenterMainActivity.Progress2017FebWeek4();
-                presenterMainActivity.onTouchImageView();
+                        presenterMainActivity.MainProcess();
+                        //Focus Touch and detect object
+                        //presenterMainActivity.Progress2017FebWeek4();
+                        presenterMainActivity.onTouchImageView();
+
+                        btnProcessing.setVisibility(View.INVISIBLE);
+                        processedImage2.setVisibility(View.INVISIBLE);
+                        dialog.dismiss();
+                    }
+                }, 200);
+
+
             }
         });
 
