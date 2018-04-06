@@ -214,29 +214,29 @@ public class PresenterMainActivity {
     }
 
     public void MainProcess(){
-        FeatureDetector detector = FeatureDetector.create(FeatureDetector.ORB);
-        MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
-        MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
-        DescriptorExtractor descriptorExtractor =  DescriptorExtractor.create(DescriptorExtractor.ORB);
-
-        //detect the keypoints
-        detector.detect(inputMat1,keypoints1);
-        detector.detect(inputMat2,keypoints2);
-
-        //detect decriptor
-        Mat descriptors1 = new Mat();
-        Mat descriptors2 = new Mat();
-        descriptorExtractor.compute(inputMat1,keypoints1,descriptors1);
-        descriptorExtractor.compute(inputMat2,keypoints2,descriptors2);
-
-        processedMat1 = new Mat();
-        processedMat2 = new Mat();
-
-        Imgproc.cvtColor(inputMat1,processedMat1,Imgproc.COLOR_RGBA2RGB);
-        Imgproc.cvtColor(inputMat2,processedMat2, Imgproc.COLOR_RGBA2RGB);
-
-        ShowImage(processedImageView1,processedMat1);
-        ShowImage(processedImageView2,processedMat2);
+//        FeatureDetector detector = FeatureDetector.create(FeatureDetector.ORB);
+//        MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
+//        MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
+//        DescriptorExtractor descriptorExtractor =  DescriptorExtractor.create(DescriptorExtractor.ORB);
+//
+//        //detect the keypoints
+//        detector.detect(inputMat1,keypoints1);
+//        detector.detect(inputMat2,keypoints2);
+//
+//        //detect decriptor
+//        Mat descriptors1 = new Mat();
+//        Mat descriptors2 = new Mat();
+//        descriptorExtractor.compute(inputMat1,keypoints1,descriptors1);
+//        descriptorExtractor.compute(inputMat2,keypoints2,descriptors2);
+//
+//        processedMat1 = new Mat();
+//        processedMat2 = new Mat();
+//
+//        Imgproc.cvtColor(inputMat1,processedMat1,Imgproc.COLOR_RGBA2RGB);
+//        Imgproc.cvtColor(inputMat2,processedMat2, Imgproc.COLOR_RGBA2RGB);
+//
+//        ShowImage(processedImageView1,processedMat1);
+//        ShowImage(processedImageView2,processedMat2);
 
         //Scalar in function drawKeypoints is color of Keypoint
         //DrawMatchesFlags
@@ -245,8 +245,8 @@ public class PresenterMainActivity {
         // NOT_DRAW_SINGLE_POINTS = 2, // Single keypoints will not be drawn.
         // DRAW_RICH_KEYPOINTS = 4 // For each keypoint,
         // the circle around keypoint with keypoint size and orientation will be drawn.
-        Features2d.drawKeypoints(processedMat1,keypoints1,processedMat1,new Scalar(255,255,0),4);
-        Features2d.drawKeypoints(processedMat2,keypoints2,processedMat2,new Scalar(255,255,0),4);
+//        Features2d.drawKeypoints(processedMat1,keypoints1,processedMat1,new Scalar(255,255,0),4);
+//        Features2d.drawKeypoints(processedMat2,keypoints2,processedMat2,new Scalar(255,255,0),4);
 
 //        ShowImage(processedImageView1,processedMat1);
 //        ShowImage(processedImageView2,processedMat2);
@@ -266,10 +266,10 @@ public class PresenterMainActivity {
 
 
         //Edge detection
-        Mat processedMat1_detectedEdges = new Mat();
-        Mat processedMat2_detectedEdges = new Mat();
-        processedMat1_detectedEdges = EdgeDetector(inputMat1);
-        processedMat2_detectedEdges = EdgeDetector(inputMat2);
+//        Mat processedMat1_detectedEdges = new Mat();
+//        Mat processedMat2_detectedEdges = new Mat();
+//        processedMat1_detectedEdges = EdgeDetector(inputMat1);
+//        processedMat2_detectedEdges = EdgeDetector(inputMat2);
 //        ShowImage(processedImageView1, processedMat1_detectedEdges);
 //        ShowImage(processedImageView2, processedMat2_detectedEdges);
 
@@ -407,8 +407,10 @@ public class PresenterMainActivity {
         Mat waterShedMatInput2 = inputMat2.clone();
         Mat appliedWaterShed1 = new Mat();
         Mat appliedWaterShed2 = new Mat();
-        appliedWaterShed1 = StepToWaterShed(waterShedMatInput1);
-        appliedWaterShed2 = StepToWaterShed(waterShedMatInput2);
+//        appliedWaterShed1 = StepToWaterShed(waterShedMatInput1);
+//        appliedWaterShed2 = StepToWaterShed(waterShedMatInput2);
+        appliedWaterShed1 = inputMat1.clone();
+        appliedWaterShed2 = inputMat2.clone();
 //        ShowImage(processedImageView1, appliedWaterShed1);
 //        ShowImage(processedImageView2, appliedWaterShed2);
 
@@ -460,10 +462,10 @@ public class PresenterMainActivity {
 //        ShowImage(processedImageView1, imageSegmentation1);
 //        ShowImage(processedImageView2, imageSegmentation2);
 
-        K_MeanProcessing k_mean_near = new K_MeanProcessing(inputMat1);
-        K_MeanProcessing k_mean_far = new K_MeanProcessing(inputMat2);
-        Mat k_meanResult_near = k_mean_near.GetResult();
-        Mat k_meanResult_far = k_mean_far.GetResult();
+//        K_MeanProcessing k_mean_near = new K_MeanProcessing(inputMat1);
+//        K_MeanProcessing k_mean_far = new K_MeanProcessing(inputMat2);
+//        Mat k_meanResult_near = k_mean_near.GetResult();
+//        Mat k_meanResult_far = k_mean_far.GetResult();
 //        ShowImage(processedImageView1,k_meanResult_near);
 //        ShowImage(processedImageView2, k_meanResult_far);
 
