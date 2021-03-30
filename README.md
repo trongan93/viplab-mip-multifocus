@@ -16,3 +16,14 @@ feature points. The most important is the precise detection of the regions throu
 To perform the identification of focused regions and the objects within the image, this thesis proposes the method of aggregating information from the recognition of the edge on image. In this thesis, we will focus on building edge and contour detection based on Adaptive Threshold. This method, the maximum efficiency compared to the method through Global Threshold. Plus, that's the information of the image through partitioning and incorporating algorithms in the image processing to determine the focus areas of the image.<br/>
 By all algorithms and implementing methods, we will carry out entirely on mobile platform. We intend to take advantage of smartphone’s enhanced flexibility and high
 performance to make the selection of areas via the touch screen of the mobile device.</p>
+
+<p>ACKNOWLEDGMENTS<br/>
+In order to be able to carry out this research topic and graduation thesis, it is not only me but great guidance and help from many different peoples from many diverse lifestyles.<br/>
+But first, I would like to thank my parents for always supporting me on my path of study and research. They did not help me in my profession but were always the greatest support for me to carry out this research thesis.<br/>
+Next and most importantly, I would like to send my sincere thanks to Professor Pei-Jun Lee (李佩君). She was not only a knowledgeable scientific instructor but she also gave me many favorable conditions during this research. I am a foreign student. Differences in language are a certain barrier in the process of exchanging and working. However, the professor and I overcame that barrier to achieve results in the research process. I am very grateful for that.<br/>
+I would also like to thank the Electrical Engineering Department professors and members who helped and taught me how to complete my Master's degree program.<br/>
+In particular, I would like to thank my fellow students at Video Processing and Application (ViP) Lab, for always accompanying and supporting me throughout the study period.<br/>
+I would also like to thank all of my friends for helping complete this Master's degree program and graduation thesis.<br/>
+</p>
+<p>Taiwan, March 2018<br/>
+  Trong-An Bui</p>
